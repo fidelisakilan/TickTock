@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tick_tock/main.dart';
+import 'package:tick_tock/modules/home/models/event_model.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationManager {
