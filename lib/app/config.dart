@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 export 'package:flutter/material.dart';
+export 'package:tick_tock/shared/components/dimensions.dart';
+
 
 extension BuildContextExtension on BuildContext {
   ColorScheme get colorScheme => Theme.of(this).colorScheme;

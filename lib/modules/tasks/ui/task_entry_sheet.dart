@@ -3,7 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
 import 'package:tick_tock/modules/tasks/models/task_model.dart';
-import 'package:tick_tock/shared/components/dimensions.dart';
+import 'package:tick_tock/modules/tasks/ui/custom_repeat_screen.dart';
+import 'package:tick_tock/modules/tasks/ui/repeat_option_dialog.dart';
 
 class TaskEntrySheet extends StatefulWidget {
   const TaskEntrySheet({super.key});
@@ -41,9 +42,13 @@ class _TaskEntrySheetState extends State<TaskEntrySheet> {
                 ),
                 Padding(
                   padding: Dimens.horizontalPadding,
-                  child: FilledButton(
-                    onPressed: _onSave,
-                    child: const Text('Save'),
+                  child: BlocBuilder<CreateTaskCubit, CreateTaskState>(
+                    builder: (context, state) {
+                      return FilledButton(
+                        onPressed: state.title != null ? _onSave : null,
+                        child: const Text('Save'),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -145,6 +150,9 @@ class _ReminderWidget extends StatefulWidget {
 }
 
 class _ReminderWidgetState extends State<_ReminderWidget> {
+  RepeatMode get repeatMode =>
+      context.watch<CreateTaskCubit>().state.repeatMode;
+
   void _datePicker() async {
     final date = context.read<CreateTaskCubit>().state.startDate;
     final newDate = await showDialog(
@@ -178,37 +186,21 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
   }
 
   void _repeatMode() async {
-    final repeatMode = context.read<CreateTaskCubit>().state.repeatMode;
-
-    showDialog(
+    final result = await showDialog(
       context: context,
-      builder: (context) {
-        return Center(
-          child: Padding(
-            padding: Dimens.horizontalPadding,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: RepeatMode.values.length,
-                itemBuilder: (context, index) {
-                  final item = RepeatMode.values[index];
-                  return Material(
-                    color: context.colorScheme.surfaceContainerHighest,
-                    child: RadioListTile<RepeatMode>(
-                      title: Text(item.name),
-                      value: item,
-                      onChanged: (value) {},
-                      groupValue: repeatMode,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        );
-      },
+      builder: (_) => RepeatOptionsDialog(currentRepeatMode: repeatMode),
     );
+
+    if (!mounted) return;
+
+    if (result == RepeatMode.custom) {
+      context.push(const CustomRepeatScreen());
+      return;
+    }
+
+    if (result is RepeatMode && mounted) {
+      context.read<CreateTaskCubit>().setRepeatMode(result);
+    }
   }
 
   @override
@@ -308,7 +300,7 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
                 ),
                 const GapBox(gap: Gap.xxs),
                 Text(
-                  'Does not repeat',
+                  repeatMode.tileName,
                   style: context.textTheme.bodyLarge!.copyWith(
                     color: context.colorScheme.onSurface,
                   ),

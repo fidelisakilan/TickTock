@@ -13,6 +13,9 @@ class App extends StatelessWidget {
         final themeData = ThemeData(
           scaffoldBackgroundColor: context.colorScheme.surface,
           textTheme: GoogleFonts.interTextTheme(),
+          datePickerTheme: DatePickerThemeData(
+            backgroundColor: context.colorScheme.surfaceContainerHighest,
+          ),
           filledButtonTheme: FilledButtonThemeData(
               style: ButtonStyle(
                   padding: WidgetStateProperty.all(EdgeInsets.zero))),

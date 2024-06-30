@@ -27,5 +27,9 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     emit(state.copyWith(startTime: time));
   }
 
+  void setRepeatMode(RepeatMode mode) {
+    emit(state.copyWith(repeatMode: mode));
+  }
+
   void onSave() {}
 }
