@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -42,7 +43,7 @@ class ExceptionHandler {
                   : 'Some error occurred',
               statusCode: error.response?.statusCode);
         case DioExceptionType.unknown:
-          print(_checkOtherErrors(error));
+          log(_checkOtherErrors(error));
           return APIException(
               message: _checkOtherErrors(error),
               statusCode: error.response?.statusCode);
