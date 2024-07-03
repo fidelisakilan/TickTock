@@ -1,10 +1,13 @@
 import 'package:tick_tock/app/config.dart';
-import 'package:tick_tock/modules/tasks/models/task_model.dart';
+import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
 
 class RepeatOptionsDialog extends StatelessWidget {
-  final RepeatMode currentRepeatMode;
+  final RepeatFrequency currentMode;
 
-  const RepeatOptionsDialog({super.key, required this.currentRepeatMode});
+  const RepeatOptionsDialog({
+    super.key,
+    required this.currentMode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,20 +18,20 @@ class RepeatOptionsDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           child: ListView.builder(
             shrinkWrap: true,
-            itemCount: RepeatMode.values.length,
+            itemCount: RepeatFrequency.values.length,
             itemBuilder: (context, index) {
-              final item = RepeatMode.values[index];
+              final item = RepeatFrequency.values[index];
               return Material(
                 color: context.colorScheme.surfaceContainerHighest,
-                child: RadioListTile<RepeatMode>(
-                  title: Text(item.tileName),
+                child: RadioListTile<RepeatFrequency>(
+                  title: Text(item.label),
                   value: item,
-                  onChanged: (RepeatMode? value) {
+                  onChanged: (RepeatFrequency? value) {
                     if (value != null) {
                       context.pop(value);
                     }
                   },
-                  groupValue: currentRepeatMode,
+                  groupValue: currentMode,
                 ),
               );
             },

@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
-import 'package:tick_tock/modules/tasks/models/task_model.dart';
 import 'package:tick_tock/modules/tasks/ui/custom_repeat_screen.dart';
 import 'package:tick_tock/modules/tasks/ui/repeat_option_dialog.dart';
 
@@ -42,7 +41,7 @@ class _TaskEntrySheetState extends State<TaskEntrySheet> {
                 ),
                 Padding(
                   padding: Dimens.horizontalPadding,
-                  child: BlocBuilder<CreateTaskCubit, CreateTaskState>(
+                  child: BlocBuilder<CreateTaskCubit, TaskDetails>(
                     builder: (context, state) {
                       return FilledButton(
                         onPressed: state.title != null ? _onSave : null,
@@ -79,7 +78,8 @@ class _TaskTitleWidgetState extends State<_TaskTitleWidget> {
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: TextField(
         onChanged: (String content) {
-          context.read<CreateTaskCubit>().setTitle(content.trim());
+          final trimmed = content.trim().isNotEmpty ? content.trim() : null;
+          context.read<CreateTaskCubit>().setTitle(trimmed);
         },
         decoration: InputDecoration(
           border: InputBorder.none,
@@ -121,7 +121,9 @@ class _TaskDescriptionWidget extends StatelessWidget {
               minLines: null,
               maxLines: null,
               onChanged: (String content) {
-                context.read<CreateTaskCubit>().setDescription(content.trim());
+                final trimmed =
+                    content.trim().isNotEmpty ? content.trim() : null;
+                context.read<CreateTaskCubit>().setDescription(trimmed);
               },
               scrollPadding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -150,11 +152,8 @@ class _ReminderWidget extends StatefulWidget {
 }
 
 class _ReminderWidgetState extends State<_ReminderWidget> {
-  RepeatMode get repeatMode =>
-      context.watch<CreateTaskCubit>().state.repeatMode;
-
   void _datePicker() async {
-    final date = context.read<CreateTaskCubit>().state.startDate;
+    final date = context.read<CreateTaskCubit>().state.startDate.date;
     final newDate = await showDialog(
       context: context,
       builder: (context) {
@@ -171,7 +170,7 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
   }
 
   void _timePicker() async {
-    final time = context.read<CreateTaskCubit>().state.startTime;
+    final time = context.read<CreateTaskCubit>().state.startDate.time;
     final newTime = await showDialog(
       context: context,
       builder: (context) {
@@ -186,76 +185,92 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
   }
 
   void _repeatMode() async {
+    RepeatFrequency currentMode =
+        switch (context.read<CreateTaskCubit>().state) {
+      CustomTaskDetails() => RepeatFrequency.custom,
+      DefaultTaskDetails(:final repeats) =>
+        repeats?.frequency ?? RepeatFrequency.none,
+    };
+
     final result = await showDialog(
       context: context,
-      builder: (_) => RepeatOptionsDialog(currentRepeatMode: repeatMode),
+      builder: (_) => RepeatOptionsDialog(
+        currentMode: currentMode,
+      ),
     );
 
     if (!mounted) return;
 
-    if (result == RepeatMode.custom) {
+    if (result == RepeatFrequency.custom) {
       context.push(const CustomRepeatScreen());
       return;
     }
 
-    if (result is RepeatMode && mounted) {
+    if (result is RepeatFrequency && mounted) {
       context.read<CreateTaskCubit>().setRepeatMode(result);
     }
   }
 
+  String _tileName(TaskDetails details) {
+    return switch (details) {
+      DefaultTaskDetails(:final repeats) =>
+        repeats?.frequency.label ?? RepeatFrequency.values.first.label,
+      CustomTaskDetails() => RepeatFrequency.values.last.label,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: Dimens.horizontalPadding,
-      child: Column(
-        children: [
-          Row(
-            textBaseline: TextBaseline.alphabetic,
-            crossAxisAlignment: CrossAxisAlignment.center,
+    return BlocBuilder<CreateTaskCubit, TaskDetails>(
+      builder: (context, state) {
+        return Padding(
+          padding: Dimens.horizontalPadding,
+          child: Column(
             children: [
-              Icon(
-                Icons.access_time,
-                color: context.colorScheme.onSurface,
-              ),
-              const GapBox(gap: Gap.xxs),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'All-day',
-                      style: context.textTheme.bodyLarge!.copyWith(
+              switch (state) {
+                DefaultTaskDetails(:final allDay) => Row(
+                    textBaseline: TextBaseline.alphabetic,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.access_time,
                         color: context.colorScheme.onSurface,
                       ),
-                    ),
-                    BlocBuilder<CreateTaskCubit, CreateTaskState>(
-                      buildWhen: (previous, current) =>
-                          previous.allDay != current.allDay,
-                      builder: (context, state) {
-                        return Switch(
-                          value: state.allDay,
-                          onChanged: (value) {
-                            context.read<CreateTaskCubit>().setAllDay(value);
-                          },
-                        );
-                      },
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const GapBox(gap: Gap.xs),
-          Row(
-            children: [
-              const Icon(
-                Icons.access_time,
-                color: Colors.transparent,
-              ),
-              const GapBox(gap: Gap.xxs),
-              BlocBuilder<CreateTaskCubit, CreateTaskState>(
-                builder: (context, state) {
-                  return Expanded(
+                      const GapBox(gap: Gap.xxs),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'All-day',
+                              style: context.textTheme.bodyLarge!.copyWith(
+                                color: context.colorScheme.onSurface,
+                              ),
+                            ),
+                            Switch(
+                              value: allDay,
+                              onChanged: (value) {
+                                context
+                                    .read<CreateTaskCubit>()
+                                    .setAllDay(value);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                CustomTaskDetails() => const SizedBox(),
+              },
+              const GapBox(gap: Gap.xs),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.access_time,
+                    color: Colors.transparent,
+                  ),
+                  const GapBox(gap: Gap.xxs),
+                  Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -263,54 +278,54 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
                           onTap: _datePicker,
                           child: Text(
                             DateFormat('EEE, MMM d, yyyy')
-                                .format(state.startDate),
+                                .format(state.startDate.date),
                             style: context.textTheme.bodyLarge!.copyWith(
                               color: context.colorScheme.onSurface,
                             ),
                           ),
                         ),
-                        Visibility(
-                          visible: !state.allDay,
-                          child: GestureDetector(
-                            onTap: _timePicker,
-                            child: Text(
-                              state.startTime.format(context),
-                              style: context.textTheme.bodyLarge!.copyWith(
-                                color: context.colorScheme.onSurface,
+                        switch (state) {
+                          CustomTaskDetails() => const SizedBox(),
+                          DefaultTaskDetails() => GestureDetector(
+                              onTap: _timePicker,
+                              child: Text(
+                                state.startDate.time.format(context),
+                                style: context.textTheme.bodyLarge!.copyWith(
+                                  color: context.colorScheme.onSurface,
+                                ),
                               ),
                             ),
-                          ),
-                        ),
+                        },
                       ],
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
+              const GapBox(gap: Gap.xs),
+              GestureDetector(
+                onTap: _repeatMode,
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Icon(
+                      Icons.replay,
+                      color: context.colorScheme.onSurface,
+                    ),
+                    const GapBox(gap: Gap.xxs),
+                    Text(
+                      _tileName(state),
+                      style: context.textTheme.bodyLarge!.copyWith(
+                        color: context.colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const GapBox(gap: Gap.xxs),
             ],
           ),
-          const GapBox(gap: Gap.xs),
-          GestureDetector(
-            onTap: _repeatMode,
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Icon(
-                  Icons.replay,
-                  color: context.colorScheme.onSurface,
-                ),
-                const GapBox(gap: Gap.xxs),
-                Text(
-                  repeatMode.tileName,
-                  style: context.textTheme.bodyLarge!.copyWith(
-                    color: context.colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const GapBox(gap: Gap.xxs),
-        ],
-      ),
+        );
+      },
     );
   }
 }

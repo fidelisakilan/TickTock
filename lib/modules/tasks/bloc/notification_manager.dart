@@ -1,12 +1,11 @@
 import 'dart:developer';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
 import 'package:timezone/timezone.dart' as tz;
 
-import '../models/task_model.dart';
-
 class NotificationManager {
-  void schedule(TaskModel model) async {
+  void schedule(TaskDetails model) async {
     try {
       final permission1 = await Permission.notification.request();
       final permission2 = await Permission.scheduleExactAlarm.request();
@@ -21,7 +20,7 @@ class NotificationManager {
         104,
         model.title,
         model.description,
-        tz.TZDateTime.from(model.startDate, tz.local),
+        tz.TZDateTime.from(model.startDate.date, tz.local),
         const NotificationDetails(
           android: AndroidNotificationDetails(
             'reminders',
