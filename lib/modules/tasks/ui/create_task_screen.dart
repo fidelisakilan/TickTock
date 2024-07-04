@@ -2,8 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
+import 'package:tick_tock/modules/tasks/models/extensions.dart';
 import 'package:tick_tock/modules/tasks/ui/custom_repeat_screen.dart';
-import 'package:tick_tock/modules/tasks/ui/repeat_option_dialog.dart';
+import 'package:tick_tock/modules/tasks/ui/repeat_options_widget.dart';
 
 class TaskEntrySheet extends StatefulWidget {
   const TaskEntrySheet({super.key});
@@ -194,7 +195,7 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
 
     final result = await showDialog(
       context: context,
-      builder: (_) => RepeatOptionsDialog(
+      builder: (_) => RepeatOptionsWidget(
         currentMode: currentMode,
       ),
     );
@@ -277,8 +278,7 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
                         GestureDetector(
                           onTap: _datePicker,
                           child: Text(
-                            DateFormat('EEE, MMM d, yyyy')
-                                .format(state.startDate.date),
+                            state.startDate.date.formattedText,
                             style: context.textTheme.bodyLarge!.copyWith(
                               color: context.colorScheme.onSurface,
                             ),

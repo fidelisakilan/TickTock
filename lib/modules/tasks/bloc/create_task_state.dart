@@ -60,16 +60,17 @@ class TimeOfDayConverter
 }
 
 enum RepeatFrequency {
-  none(label: 'Does not repeat'),
-  days(label: 'Every day'),
-  weeks(label: 'Every week'),
-  months(label: 'Every month'),
-  years(label: 'Every year'),
-  custom(label: 'Custom...');
+  none(label: 'Does not repeat', dropdownTitle: 'None'),
+  days(label: 'Every day', dropdownTitle: 'Day'),
+  weeks(label: 'Every week', dropdownTitle: 'Week'),
+  months(label: 'Every month', dropdownTitle: 'Month'),
+  years(label: 'Every year', dropdownTitle: 'Year'),
+  custom(label: 'Custom...', dropdownTitle: 'Custom');
 
   final String label;
+  final String dropdownTitle;
 
-  const RepeatFrequency({required this.label});
+  const RepeatFrequency({required this.label, required this.dropdownTitle});
 }
 
 enum WeekDay { sunday, monday, tuesday, wednesday, thursday, friday, saturday }

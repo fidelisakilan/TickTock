@@ -10,9 +10,9 @@ part 'create_task_cubit.g.dart';
 
 class CreateTaskCubit extends Cubit<TaskDetails> {
   CreateTaskCubit()
-      : super(TaskDetails.defaults(startDate: _startDate(), allDay: false));
+      : super(TaskDetails.defaults(startDate: startDate(), allDay: false));
 
-  static TimeStamp _startDate() {
+  static TimeStamp startDate() {
     final date = DateTime.now().add(const Duration(hours: 1));
     return TimeStamp(
       date: DateTime(date.year, date.month, date.day),

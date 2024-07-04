@@ -11,6 +11,7 @@ class App extends StatelessWidget {
     return DynamicColorBuilder(
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
         final themeData = ThemeData(
+          dividerTheme: const DividerThemeData(space: 32),
           scaffoldBackgroundColor: context.colorScheme.surface,
           textTheme: GoogleFonts.interTextTheme(),
           datePickerTheme: DatePickerThemeData(

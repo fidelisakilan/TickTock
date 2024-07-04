@@ -1,13 +1,10 @@
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
 
-class RepeatOptionsDialog extends StatelessWidget {
+class RepeatOptionsWidget extends StatelessWidget {
   final RepeatFrequency currentMode;
 
-  const RepeatOptionsDialog({
-    super.key,
-    required this.currentMode,
-  });
+  const RepeatOptionsWidget({super.key, required this.currentMode});
 
   @override
   Widget build(BuildContext context) {
