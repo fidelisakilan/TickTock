@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:tick_tock/app/config.dart';
 import 'custom_reminder_list_widget.dart';
 import 'default_preset_widget.dart';
@@ -30,6 +29,7 @@ class _CustomRepeatScreenState extends State<CustomRepeatScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.colorScheme.surface,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Custom...'),
         actions: [

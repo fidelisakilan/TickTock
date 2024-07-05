@@ -154,6 +154,8 @@ class _ReminderWidget extends StatefulWidget {
 
 class _ReminderWidgetState extends State<_ReminderWidget> {
   void _datePicker() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
     final date = context.read<CreateTaskCubit>().state.startDate.date;
     final newDate = await showDialog(
       context: context,
@@ -171,6 +173,8 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
   }
 
   void _timePicker() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
     final time = context.read<CreateTaskCubit>().state.startDate.time;
     final newTime = await showDialog(
       context: context,

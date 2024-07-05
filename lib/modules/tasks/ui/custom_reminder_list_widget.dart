@@ -32,7 +32,8 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
         ListView.separated(
           itemCount: timeStampList.length,
           padding: const EdgeInsets.symmetric(vertical: 20),
-          separatorBuilder: (context, index) => const Divider(height: 0,indent: 60),
+          separatorBuilder: (context, index) =>
+              const Divider(height: 0, indent: 60),
           itemBuilder: (context, index) {
             final item = timeStampList[index];
             return GestureDetector(
@@ -41,7 +42,8 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
                 decoration: BoxDecoration(
                   color: context.colorScheme.surfaceContainer,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: Row(
                   children: [
                     Container(
@@ -99,7 +101,6 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
               ),
             );
           },
-
         ),
         SafeArea(
           child: Padding(
@@ -108,7 +109,7 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
               foregroundColor: context.colorScheme.onPrimaryContainer,
               backgroundColor: context.colorScheme.primaryContainer,
               onPressed: _addTime,
-              child: const Icon(Icons.edit_outlined),
+              child: const Icon(Icons.add_alarm),
             ),
           ),
         ),

@@ -15,6 +15,7 @@ class RepeatOptionsWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           child: ListView.builder(
             shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: RepeatFrequency.values.length,
             itemBuilder: (context, index) {
               final item = RepeatFrequency.values[index];

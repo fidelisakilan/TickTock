@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
           : Brightness.light,
     ));
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: context.colorScheme.surface,
       floatingActionButton: FloatingActionButton(
         onPressed: onTap,
