@@ -2,20 +2,16 @@ part of 'create_task_cubit.dart';
 
 @freezed
 sealed class TaskDetails with _$TaskDetails {
-  const factory TaskDetails.custom({
+  const factory TaskDetails({
     String? title,
     String? description,
     required TimeStamp startDate,
-    required List<TimeStamp> reminders,
-  }) = CustomTaskDetails;
-
-  const factory TaskDetails.defaults({
-    String? title,
-    String? description,
-    required TimeStamp startDate,
-    required bool allDay,
-    RepeatDetails? repeats,
-  }) = DefaultTaskDetails;
+    @Default(RepeatFrequency.none) RepeatFrequency repeatFrequency,
+    @Default(false) bool allDay,
+    @Default(RepeatDetails(interval: 1, weekdays: []))
+    RepeatDetails repeats,
+    @Default([]) List<TimeStamp> reminders,
+  }) = _TaskDetails;
 
   factory TaskDetails.fromJson(Map<String, dynamic> json) =>
       _$TaskDetailsFromJson(json);
@@ -25,8 +21,7 @@ sealed class TaskDetails with _$TaskDetails {
 class RepeatDetails with _$RepeatDetails {
   const factory RepeatDetails({
     required int interval,
-    required RepeatFrequency frequency,
-    List<WeekDay>? weekdays,
+    required List<WeekDay> weekdays,
     DateTime? endDate,
   }) = _RepeatDetails;
 

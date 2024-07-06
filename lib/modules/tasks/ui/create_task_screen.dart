@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
 import 'package:tick_tock/modules/tasks/models/extensions.dart';
@@ -190,24 +189,23 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
   }
 
   void _repeatMode() async {
-    RepeatFrequency currentMode =
-        switch (context.read<CreateTaskCubit>().state) {
-      CustomTaskDetails() => RepeatFrequency.custom,
-      DefaultTaskDetails(:final repeats) =>
-        repeats?.frequency ?? RepeatFrequency.none,
-    };
-
+    final state = context.read<CreateTaskCubit>().state;
     final result = await showDialog(
       context: context,
       builder: (_) => RepeatOptionsWidget(
-        currentMode: currentMode,
+        currentMode: state.repeatFrequency,
       ),
     );
 
     if (!mounted) return;
-
     if (result == RepeatFrequency.custom) {
-      context.push(const CustomRepeatScreen());
+      final result = await context.push(BlocProvider.value(
+        value: context.read<CreateTaskCubit>(),
+        child: const CustomRepeatScreen(),
+      ));
+      if (result is! bool && mounted) {
+        context.read<CreateTaskCubit>().updateDetails(state);
+      }
       return;
     }
 
@@ -216,13 +214,7 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
     }
   }
 
-  String _tileName(TaskDetails details) {
-    return switch (details) {
-      DefaultTaskDetails(:final repeats) =>
-        repeats?.frequency.label ?? RepeatFrequency.values.first.label,
-      CustomTaskDetails() => RepeatFrequency.values.last.label,
-    };
-  }
+  String _tileName(TaskDetails details) => details.repeatFrequency.label;
 
   @override
   Widget build(BuildContext context) {
@@ -232,41 +224,39 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
           padding: Dimens.horizontalPadding,
           child: Column(
             children: [
-              switch (state) {
-                DefaultTaskDetails(:final allDay) => Row(
-                    textBaseline: TextBaseline.alphabetic,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.access_time,
-                        color: context.colorScheme.onSurface,
-                      ),
-                      const GapBox(gap: Gap.xxs),
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'All-day',
-                              style: context.textTheme.bodyLarge!.copyWith(
-                                color: context.colorScheme.onSurface,
-                              ),
+              Visibility(
+                visible: state.repeatFrequency != RepeatFrequency.custom,
+                child: Row(
+                  textBaseline: TextBaseline.alphabetic,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      color: context.colorScheme.onSurface,
+                    ),
+                    const GapBox(gap: Gap.xxs),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'All-day',
+                            style: context.textTheme.bodyLarge!.copyWith(
+                              color: context.colorScheme.onSurface,
                             ),
-                            Switch(
-                              value: allDay,
-                              onChanged: (value) {
-                                context
-                                    .read<CreateTaskCubit>()
-                                    .setAllDay(value);
-                              },
-                            ),
-                          ],
-                        ),
+                          ),
+                          Switch(
+                            value: state.allDay,
+                            onChanged: (value) {
+                              context.read<CreateTaskCubit>().setAllDay(value);
+                            },
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                CustomTaskDetails() => const SizedBox(),
-              },
+                    ),
+                  ],
+                ),
+              ),
               const GapBox(gap: Gap.xs),
               Row(
                 children: [
@@ -288,18 +278,18 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
                             ),
                           ),
                         ),
-                        switch (state) {
-                          CustomTaskDetails() => const SizedBox(),
-                          DefaultTaskDetails() => GestureDetector(
-                              onTap: _timePicker,
-                              child: Text(
-                                state.startDate.time.format(context),
-                                style: context.textTheme.bodyLarge!.copyWith(
-                                  color: context.colorScheme.onSurface,
-                                ),
+                        Visibility(
+                          visible: !state.allDay,
+                          child: GestureDetector(
+                            onTap: _timePicker,
+                            child: Text(
+                              state.startDate.time.format(context),
+                              style: context.textTheme.bodyLarge!.copyWith(
+                                color: context.colorScheme.onSurface,
                               ),
                             ),
-                        },
+                          ),
+                        ),
                       ],
                     ),
                   ),

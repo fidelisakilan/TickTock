@@ -1,4 +1,6 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
+import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
 import 'custom_reminder_list_widget.dart';
 import 'default_preset_widget.dart';
 
@@ -13,10 +15,22 @@ class _CustomRepeatScreenState extends State<CustomRepeatScreen>
     with TickerProviderStateMixin {
   late final TabController _tabController;
 
+  CreateTaskCubit get cubit => context.read<CreateTaskCubit>();
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    switch (cubit.state.repeatFrequency) {
+      case RepeatFrequency.none:
+        cubit.setRepeatMode(RepeatFrequency.days);
+        break;
+      case RepeatFrequency.custom:
+        _tabController.animateTo(1, duration: Duration.zero);
+        break;
+      default:
+        break;
+    }
   }
 
   @override
@@ -41,7 +55,12 @@ class _CustomRepeatScreenState extends State<CustomRepeatScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              if (_tabController.index == 1) {
+                cubit.setRepeatMode(RepeatFrequency.custom);
+              }
+              context.pop(true);
+            },
           ),
         ],
       ),

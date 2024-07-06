@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -9,8 +11,7 @@ part 'create_task_cubit.freezed.dart';
 part 'create_task_cubit.g.dart';
 
 class CreateTaskCubit extends Cubit<TaskDetails> {
-  CreateTaskCubit()
-      : super(TaskDetails.defaults(startDate: startDate(), allDay: false));
+  CreateTaskCubit() : super(TaskDetails(startDate: startDate(), allDay: false));
 
   static TimeStamp startDate() {
     final date = DateTime.now().add(const Duration(hours: 1));
@@ -29,13 +30,11 @@ class CreateTaskCubit extends Cubit<TaskDetails> {
   }
 
   void setAllDay(bool value) {
-    switch (state) {
-      case DefaultTaskDetails():
-        emit((state as DefaultTaskDetails).copyWith(allDay: value));
-        break;
-      default:
-        break;
-    }
+    emit(state.copyWith(allDay: value));
+  }
+
+  void setStartTimeStamp(TimeStamp timeStamp) {
+    emit(state.copyWith(startDate: timeStamp));
   }
 
   void setStartDate(DateTime date) {
@@ -47,16 +46,30 @@ class CreateTaskCubit extends Cubit<TaskDetails> {
   }
 
   void setRepeatMode(RepeatFrequency frequency) {
-    switch (state) {
-      case DefaultTaskDetails():
-        emit((state as DefaultTaskDetails).copyWith(
-          repeats: RepeatDetails(interval: 1, frequency: frequency),
-        ));
-        break;
-      default:
-        break;
-    }
+    emit(state.copyWith(repeatFrequency: frequency));
   }
 
-  void onSave() {}
+  void setRepeatInterval(int value) {
+    emit(state.copyWith.repeats(interval: value));
+  }
+
+  void setWeekDays(List<WeekDay> weekdays) {
+    emit(state.copyWith.repeats(weekdays: weekdays));
+  }
+
+  void updateDetails(TaskDetails details) {
+    emit(details);
+  }
+
+  void setEndingDate([DateTime? value]) {
+    emit(state.copyWith.repeats(endDate: value));
+  }
+
+  void setCustomTimeList(List<TimeStamp> value) {
+    emit(state.copyWith(reminders: value));
+  }
+
+  void onSave() {
+    log(state.toString());
+  }
 }

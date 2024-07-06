@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/tasks/models/extensions.dart';
 
@@ -9,15 +10,21 @@ class DefaultPresetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        RepeatEveryWidget(),
-        Divider(),
-        WeekDaySelectionWidget(),
-        Divider(),
-        RepeatEndWidget(),
-        Divider(),
-      ],
+    return BlocBuilder<CreateTaskCubit, TaskDetails>(
+      builder: (context, state) {
+        return Column(
+          children: [
+            const RepeatEveryWidget(),
+            const Divider(),
+            if (state.repeatFrequency == RepeatFrequency.weeks) ...[
+              WeekDaySelectionWidget(selectedDays: state.repeats.weekdays),
+              const Divider(),
+            ],
+            const RepeatEndWidget(),
+            const Divider(),
+          ],
+        );
+      },
     );
   }
 }
@@ -30,100 +37,106 @@ class RepeatEndWidget extends StatefulWidget {
 }
 
 class _RepeatEndWidgetState extends State<RepeatEndWidget> {
-  bool hasEndingDate = false;
-  DateTime endingDate = DateTime.now();
+  late DateTime endingDate;
 
-  void _datePicker() async {
+  CreateTaskCubit get cubit => context.read<CreateTaskCubit>();
+
+  @override
+  void initState() {
+    super.initState();
+    endingDate = cubit.state.repeats.endDate ?? DateTime.now();
+  }
+
+  void _datePicker(BuildContext context) async {
     final date = await showDialog(
       context: context,
       builder: (context) {
         return DatePickerDialog(
           firstDate: DateTime.now(),
-          currentDate: DateTime.now(),
+          currentDate: endingDate,
           lastDate: DateTime.now().copyWith(year: DateTime.now().year + 100),
         );
       },
     );
-    if (date is DateTime) {
-      setState(() {
-        endingDate = date;
-        hasEndingDate = true;
-      });
+    if (mounted && date is DateTime) {
+      context.read<CreateTaskCubit>().setEndingDate(date);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: Dimens.horizontalPadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Ends',
-            style: context.textTheme.labelLarge!.copyWith(
-              color: context.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          ListTile(
-            title: Text(
-              'Never',
-              style: context.textTheme.labelLarge!
-                  .copyWith(color: context.colorScheme.onSurface),
-            ),
-            leading: Radio<bool>(
-              value: false,
-              groupValue: hasEndingDate,
-              onChanged: (bool? value) {
-                if (value != null) setState(() => hasEndingDate = value);
-              },
-            ),
-          ),
-          ListTile(
-            title: Row(
-              children: [
-                Text(
-                  'On',
+    return BlocBuilder<CreateTaskCubit, TaskDetails>(
+      builder: (context, state) {
+        final hasEnding = state.repeats.endDate != null;
+        return Padding(
+          padding: Dimens.horizontalPadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Ends',
+                style: context.textTheme.labelLarge!.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              ListTile(
+                title: Text(
+                  'Never',
                   style: context.textTheme.labelLarge!
                       .copyWith(color: context.colorScheme.onSurface),
                 ),
-                const GapBox(gap: Gap.xxs),
-                IntrinsicWidth(
-                  child: TextField(
-                    decoration:
-                        const InputDecoration(border: OutlineInputBorder()),
-                    style: context.textTheme.labelLarge!
-                        .copyWith(color: context.colorScheme.onSurface),
-                    controller:
-                        TextEditingController(text: endingDate.formattedText),
-                    readOnly: true,
-                    onTap: _datePicker,
-                  ),
+                leading: Radio<bool>(
+                  value: false,
+                  groupValue: hasEnding,
+                  onChanged: (bool? value) {
+                    context.read<CreateTaskCubit>().setEndingDate();
+                  },
                 ),
-              ],
-            ),
-            leading: Radio<bool>(
-              value: true,
-              groupValue: hasEndingDate,
-              onChanged: (bool? value) {
-                if (value != null) setState(() => hasEndingDate = value);
-              },
-            ),
+              ),
+              ListTile(
+                title: Row(
+                  children: [
+                    Text(
+                      'On',
+                      style: context.textTheme.labelLarge!
+                          .copyWith(color: context.colorScheme.onSurface),
+                    ),
+                    const GapBox(gap: Gap.xxs),
+                    IntrinsicWidth(
+                      child: TextField(
+                        decoration:
+                            const InputDecoration(border: OutlineInputBorder()),
+                        style: context.textTheme.labelLarge!
+                            .copyWith(color: context.colorScheme.onSurface),
+                        controller: TextEditingController(
+                            text: endingDate.formattedText1),
+                        readOnly: true,
+                        onTap: () => _datePicker(context),
+                      ),
+                    ),
+                  ],
+                ),
+                leading: Radio<bool>(
+                  value: true,
+                  groupValue: hasEnding,
+                  onChanged: (bool? value) {
+                    context.read<CreateTaskCubit>().setEndingDate(endingDate);
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
 
-class WeekDaySelectionWidget extends StatefulWidget {
-  const WeekDaySelectionWidget({super.key});
+class WeekDaySelectionWidget extends StatelessWidget {
+  const WeekDaySelectionWidget({super.key, required this.selectedDays});
 
-  @override
-  State<WeekDaySelectionWidget> createState() => _WeekDaySelectionWidgetState();
-}
+  final List<WeekDay> selectedDays;
 
-class _WeekDaySelectionWidgetState extends State<WeekDaySelectionWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -143,11 +156,15 @@ class _WeekDaySelectionWidgetState extends State<WeekDaySelectionWidget> {
                 .map((e) => ButtonSegment<WeekDay>(
                     value: e, label: Text(e.name[0].toUpperCase())))
                 .toList(),
-            selected: const <WeekDay>{WeekDay.friday},
+            selected: selectedDays.toSet(),
             showSelectedIcon: false,
             multiSelectionEnabled: true,
             emptySelectionAllowed: true,
-            onSelectionChanged: (Set<WeekDay> newSelection) {},
+            onSelectionChanged: (Set<WeekDay> newSelection) {
+              context
+                  .read<CreateTaskCubit>()
+                  .setWeekDays(newSelection.toList());
+            },
           ),
         ],
       ),
@@ -165,6 +182,15 @@ class RepeatEveryWidget extends StatefulWidget {
 class _RepeatEveryWidgetState extends State<RepeatEveryWidget> {
   final textController = TextEditingController();
   final optionController = TextEditingController();
+
+  CreateTaskCubit get cubit => context.read<CreateTaskCubit>();
+
+  @override
+  void initState() {
+    super.initState();
+    textController.value =
+        TextEditingValue(text: cubit.state.repeats.interval.toString());
+  }
 
   final List<RepeatFrequency> options = [
     RepeatFrequency.days,
@@ -189,19 +215,24 @@ class _RepeatEveryWidgetState extends State<RepeatEveryWidget> {
           const GapBox(gap: Gap.xxs),
           Row(
             children: [
-              SizedBox(
-                width: 80,
-                child: TextField(
-                  decoration:
-                      const InputDecoration(border: OutlineInputBorder()),
-                  controller: textController,
-                  keyboardType: TextInputType.number,
-                  style: context.textTheme.labelLarge!
-                      .copyWith(color: context.colorScheme.onSurface),
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(2),
-                  ], // Onl
+              Flexible(
+                child: SizedBox(
+                  width: 80,
+                  child: TextField(
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
+                    controller: textController,
+                    keyboardType: TextInputType.number,
+                    style: context.textTheme.labelLarge!
+                        .copyWith(color: context.colorScheme.onSurface),
+                    onChanged: (value) {
+                      cubit.setRepeatInterval(int.parse(value));
+                    },
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(2),
+                    ], // Onl
+                  ),
                 ),
               ),
               const GapBox(gap: Gap.xxs),
@@ -209,7 +240,6 @@ class _RepeatEveryWidgetState extends State<RepeatEveryWidget> {
                 child: DropdownMenu<RepeatFrequency>(
                   initialSelection: options.first,
                   controller: optionController,
-                  requestFocusOnTap: false,
                   textStyle: context.textTheme.labelLarge!
                       .copyWith(color: context.colorScheme.onSurface),
                   expandedInsets: EdgeInsets.zero,
