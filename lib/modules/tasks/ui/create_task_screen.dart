@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
@@ -190,31 +193,43 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
 
   void _repeatMode() async {
     final state = context.read<CreateTaskCubit>().state;
+
+    String? currentMode = state.repeatDetailsText;
+
+    List<String> options = List.of([
+      ...RepeatFrequency.values.map((e) => e.label),
+      if (currentMode != null) currentMode,
+    ]);
+
     final result = await showDialog(
       context: context,
       builder: (_) => RepeatOptionsWidget(
-        currentMode: state.repeatFrequency,
+        options: options,
+        currentMode: currentMode ?? state.repeatFrequency.name,
       ),
     );
 
     if (!mounted) return;
-    if (result == RepeatFrequency.custom) {
-      final result = await context.push(BlocProvider.value(
-        value: context.read<CreateTaskCubit>(),
-        child: const CustomRepeatScreen(),
-      ));
-      if (result is! bool && mounted) {
-        context.read<CreateTaskCubit>().updateDetails(state);
-      }
-      return;
-    }
 
-    if (result is RepeatFrequency && mounted) {
-      context.read<CreateTaskCubit>().setRepeatMode(result);
+    if (result is String) {
+      RepeatFrequency? selectedFrequency =
+          RepeatFrequency.values.firstWhereOrNull((e) => e.label == result);
+      if (selectedFrequency == RepeatFrequency.custom) {
+        final result = await context.push(BlocProvider.value(
+          value: context.read<CreateTaskCubit>(),
+          child: const CustomRepeatScreen(),
+        ));
+        if (result is! bool && mounted) {
+          context.read<CreateTaskCubit>().updateDetails(state);
+        }
+      } else if (mounted && selectedFrequency != null) {
+        context.read<CreateTaskCubit>().setRepeatMode(selectedFrequency);
+      }
     }
   }
 
-  String _tileName(TaskDetails details) => details.repeatFrequency.label;
+  String _tileName(TaskDetails details) =>
+      details.repeatDetailsText ?? details.repeatFrequency.label;
 
   @override
   Widget build(BuildContext context) {
@@ -315,7 +330,6 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
                   ],
                 ),
               ),
-              const GapBox(gap: Gap.xxs),
             ],
           ),
         );

@@ -51,6 +51,7 @@ dependencies:
   freezed_annotation: any
   json_annotation: ^4.9.0
   collection: ^1.18.0
+  speech_to_text: ^6.6.2
 
 dev_dependencies:
   flutter_test:

@@ -2,19 +2,40 @@ part of 'create_task_cubit.dart';
 
 @freezed
 sealed class TaskDetails with _$TaskDetails {
+  const TaskDetails._();
+
   const factory TaskDetails({
     String? title,
     String? description,
     required TimeStamp startDate,
     @Default(RepeatFrequency.none) RepeatFrequency repeatFrequency,
     @Default(false) bool allDay,
-    @Default(RepeatDetails(interval: 1, weekdays: []))
-    RepeatDetails repeats,
+    @Default(RepeatDetails(interval: 1, weekdays: [])) RepeatDetails repeats,
     @Default([]) List<TimeStamp> reminders,
   }) = _TaskDetails;
 
   factory TaskDetails.fromJson(Map<String, dynamic> json) =>
       _$TaskDetailsFromJson(json);
+
+  String? get repeatDetailsText {
+    switch (repeatFrequency) {
+      case RepeatFrequency.none:
+      case RepeatFrequency.custom:
+        return null;
+      default:
+        break;
+    }
+    if (repeats.interval == 1 && repeats.endDate == null) {
+      return repeatFrequency.label;
+    } else {
+      String label =
+          'Every ${repeats.interval} ${repeatFrequency.dropdownTitle}${repeats.interval > 1 ? 's' : ''}';
+      if (repeats.endDate != null) {
+        label = '$label; Ends: ${repeats.endDate!.formattedText1}';
+      }
+      return label;
+    }
+  }
 }
 
 @freezed

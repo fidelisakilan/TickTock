@@ -2,9 +2,14 @@ import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
 
 class RepeatOptionsWidget extends StatelessWidget {
-  final RepeatFrequency currentMode;
+  final String currentMode;
+  final List<String> options;
 
-  const RepeatOptionsWidget({super.key, required this.currentMode});
+  const RepeatOptionsWidget({
+    super.key,
+    required this.currentMode,
+    required this.options,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,15 +21,15 @@ class RepeatOptionsWidget extends StatelessWidget {
           child: ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: RepeatFrequency.values.length,
+            itemCount: options.length,
             itemBuilder: (context, index) {
-              final item = RepeatFrequency.values[index];
+              final item = options[index];
               return Material(
                 color: context.colorScheme.surfaceContainerHighest,
-                child: RadioListTile<RepeatFrequency>(
-                  title: Text(item.label),
+                child: RadioListTile<String>(
+                  title: Text(item),
                   value: item,
-                  onChanged: (RepeatFrequency? value) {
+                  onChanged: (String? value) {
                     if (value != null) {
                       context.pop(value);
                     }

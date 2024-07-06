@@ -68,14 +68,25 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
                         child: ReminderCardWidget(
                           item: state.startDate,
                           index: 0,
-                          bgColor: context.colorScheme.secondaryContainer,
+                          bgColor: context.colorScheme.surfaceContainerHighest,
+                        ),
+                      ),
+                      const GapBox(gap: Gap.xxs),
+                      Padding(
+                        padding: Dimens.horizontalPadding,
+                        child: Text(
+                          'Next Reminders',
+                          style: context.textTheme.labelMedium!.copyWith(
+                            color: context.colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
+
                   );
                 }
-
-                final item = state.reminders[index + 1];
+                final item = state.reminders[index - 1];
                 return GestureDetector(
                   onTap: () => _addTime(timeStamp: item),
                   child: ReminderCardWidget(

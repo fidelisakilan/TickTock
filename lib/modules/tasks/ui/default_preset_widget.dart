@@ -226,7 +226,9 @@ class _RepeatEveryWidgetState extends State<RepeatEveryWidget> {
                     style: context.textTheme.labelLarge!
                         .copyWith(color: context.colorScheme.onSurface),
                     onChanged: (value) {
-                      cubit.setRepeatInterval(int.parse(value));
+                      if(value.trim().isNotEmpty){
+                        cubit.setRepeatInterval(int.parse(value));
+                      }
                     },
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly,

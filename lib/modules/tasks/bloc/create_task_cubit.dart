@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:tick_tock/modules/tasks/models/extensions.dart';
 
 part 'create_task_state.dart';
 
