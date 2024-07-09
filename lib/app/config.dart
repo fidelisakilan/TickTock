@@ -13,4 +13,7 @@ extension BuildContextExtension on BuildContext {
   Future push(Widget widget) {
     return Navigator.of(this).push(MaterialPageRoute(builder: (_) => widget));
   }
+  Future pushReplacement(Widget widget) {
+    return Navigator.of(this).pushReplacement(MaterialPageRoute(builder: (_) => widget));
+  }
 }

@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
 import 'package:tick_tock/modules/tasks/models/extensions.dart';
+import 'package:wave_divider/wave_divider.dart';
 
 class CustomTimeListWidget extends StatefulWidget {
   const CustomTimeListWidget({super.key});
@@ -32,6 +33,13 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
     }
   }
 
+  void _removeTime(TimeStamp timeStamp) {
+    final List<TimeStamp> newList =
+        List.from(cubit.state.reminders, growable: true);
+    newList.remove(timeStamp);
+    cubit.setCustomTimeList(newList);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CreateTaskCubit, TaskDetails>(
@@ -41,18 +49,25 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
           children: [
             ListView.separated(
               itemCount: state.reminders.length + 1,
-              separatorBuilder: (context, index) =>
-                  const Divider(height: 0, indent: 60),
+              separatorBuilder: (context, index) => Visibility(
+                visible: index != 0,
+                child: Container(
+                  color: context.colorScheme.surfaceContainerLowest,
+                  child: WaveDivider(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    color: context.colorScheme.primary,
+                  ),
+                ),
+              ),
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const GapBox(gap: Gap.xxs),
                       Padding(
                         padding: Dimens.horizontalPadding,
                         child: Text(
-                          'Start Time',
+                          'Starting Reminder',
                           style: context.textTheme.labelMedium!.copyWith(
                             color: context.colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.bold,
@@ -68,7 +83,7 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
                         child: ReminderCardWidget(
                           item: state.startDate,
                           index: 0,
-                          bgColor: context.colorScheme.surfaceContainerHighest,
+                          removeCallback: () {},
                         ),
                       ),
                       const GapBox(gap: Gap.xxs),
@@ -82,16 +97,18 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
                           ),
                         ),
                       ),
+                      const GapBox(gap: Gap.xxs),
                     ],
-
                   );
                 }
                 final item = state.reminders[index - 1];
                 return GestureDetector(
                   onTap: () => _addTime(timeStamp: item),
                   child: ReminderCardWidget(
+                    dismissible: true,
                     item: item,
-                    index: index + 1,
+                    index: index,
+                    removeCallback: () => _removeTime(item),
                   ),
                 );
               },
@@ -119,73 +136,82 @@ class ReminderCardWidget extends StatelessWidget {
     super.key,
     required this.item,
     required this.index,
-    this.bgColor,
+    this.dismissible = false,
+    required this.removeCallback,
   });
 
   final TimeStamp item;
   final int index;
-  final Color? bgColor;
+  final bool dismissible;
+  final Function removeCallback;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor ?? context.colorScheme.surfaceContainer,
+    return Dismissible(
+      background: Container(
+        color: context.colorScheme.errorContainer,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: context.colorScheme.primary),
+      key: ValueKey<int>(index),
+      direction:
+          !dismissible ? DismissDirection.none : DismissDirection.endToStart,
+      onDismissed: (direction) => removeCallback(),
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.colorScheme.surfaceContainerLowest,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            Column(
+              children: [
+                Text(
+                  '${index + 1}',
+                  style: context.textTheme.bodyLarge!.copyWith(
+                    color: context.colorScheme.onSurface,
+                  ),
+                ),
+              ],
             ),
-            padding: const EdgeInsets.all(10),
-            child: Text(
-              '${index + 1}',
+            const Spacer(),
+            Text(
+              'Date: ',
               style: context.textTheme.bodyLarge!
                   .copyWith(color: context.colorScheme.onSurface),
             ),
-          ),
-          const Spacer(),
-          Text(
-            'Date: ',
-            style: context.textTheme.bodyLarge!
-                .copyWith(color: context.colorScheme.onSurface),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: context.colorScheme.secondaryContainer,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: const EdgeInsets.all(5),
-            child: Text(
-              item.date.formattedText1,
-              style: context.textTheme.bodyLarge!.copyWith(
-                color: context.colorScheme.onSurface,
+            Container(
+              decoration: BoxDecoration(
+                color: context.colorScheme.secondaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.all(5),
+              child: Text(
+                item.date.formattedText1,
+                style: context.textTheme.bodyLarge!.copyWith(
+                  color: context.colorScheme.onSurface,
+                ),
               ),
             ),
-          ),
-          const Spacer(),
-          Text(
-            'Time: ',
-            style: context.textTheme.bodyLarge!
-                .copyWith(color: context.colorScheme.onSurface),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: context.colorScheme.tertiaryContainer,
-              borderRadius: BorderRadius.circular(10),
+            const Spacer(),
+            Text(
+              'Time: ',
+              style: context.textTheme.bodyLarge!
+                  .copyWith(color: context.colorScheme.onSurface),
             ),
-            padding: const EdgeInsets.all(5),
-            child: Text(
-              item.time.format(context),
-              style: context.textTheme.bodyLarge!.copyWith(
-                color: context.colorScheme.onSurface,
+            Container(
+              decoration: BoxDecoration(
+                color: context.colorScheme.tertiaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.all(5),
+              child: Text(
+                item.time.format(context),
+                style: context.textTheme.bodyLarge!.copyWith(
+                  color: context.colorScheme.onSurface,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

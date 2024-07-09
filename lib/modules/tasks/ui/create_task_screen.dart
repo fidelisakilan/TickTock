@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
@@ -23,7 +21,7 @@ class _TaskEntrySheetState extends State<TaskEntrySheet> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.colorScheme.surfaceDim,
+      backgroundColor: context.colorScheme.surface,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Column(

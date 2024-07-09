@@ -28,6 +28,17 @@ class MaterialTheme {
           ),
         ),
         scaffoldBackgroundColor: colorScheme.surface,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            elevation: WidgetStateProperty.all<double>(0),
+          ),
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          highlightElevation: 0,
+          foregroundColor: colorScheme.primary,
+          shape: const CircleBorder(),
+          elevation: 0,
+        ),
         canvasColor: colorScheme.surface,
       );
 
