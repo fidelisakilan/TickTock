@@ -192,18 +192,18 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
   void _repeatMode() async {
     final state = context.read<CreateTaskCubit>().state;
 
-    String? currentMode = state.repeatDetailsText;
+    String currentMode = state.repeatDetailsText ?? state.repeatFrequency.label;
 
     List<String> options = List.of([
       ...RepeatFrequency.values.map((e) => e.label),
-      if (currentMode != null) currentMode,
+      if (currentMode != state.repeatFrequency.label) currentMode,
     ]);
 
     final result = await showDialog(
       context: context,
       builder: (_) => RepeatOptionsWidget(
         options: options,
-        currentMode: currentMode ?? state.repeatFrequency.name,
+        currentMode: currentMode,
       ),
     );
 

@@ -10,7 +10,7 @@ class SpeechToTextManager {
 
   bool get isRunning => speechState.value;
 
-  Future<bool> _initialize() async {
+  Future<bool> _initialize(VoidCallback callback) async {
     try {
       return await speech.initialize(
         onStatus: (text) {
@@ -18,11 +18,13 @@ class SpeechToTextManager {
             speechState.value = true;
           } else {
             speechState.value = false;
+            callback();
           }
         },
         onError: (errorNotification) {
           log('error: $errorNotification');
           speechState.value = false;
+          callback();
         },
         debugLogging: kDebugMode,
       );
@@ -34,15 +36,14 @@ class SpeechToTextManager {
 
   void run({
     required void Function(String) onResult,
-    required void Function() onReady,
+    required void Function() onComplete,
     required void Function(String) onFailure,
   }) async {
     bool hasPermission = await PermissionHandler().requestMicrophone();
     if (!hasPermission) return onFailure('Microphone permission needed');
-    final available = await _initialize();
+    final available = await _initialize(onComplete);
 
     if (available) {
-      onReady();
       speech.listen(
         onResult: (result) {
           onResult(result.recognizedWords);
