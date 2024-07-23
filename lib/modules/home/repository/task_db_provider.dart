@@ -19,7 +19,6 @@ class TaskDbProvider {
   }
 
   Future<void> storeTaskData(TaskDetails details) async {
-    log('LOGGER:: ${details.toJson()}');
     await _taskListStore.add(await _db, details.toJson());
   }
 }

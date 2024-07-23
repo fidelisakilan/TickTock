@@ -27,7 +27,6 @@ class _TaskEntrySheetState extends State<TaskEntrySheet> {
           case CreateTaskComplete():
             context.read<TaskHistoryCubit>().fetchFromDb();
             context.pop();
-            print('Hell0 1 ');
           default:
             break;
         }

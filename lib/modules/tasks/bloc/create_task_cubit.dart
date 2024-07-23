@@ -74,7 +74,6 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
 
   void onSave() async {
     await TaskDbProvider().storeTaskData(state.taskDetails);
-    print(' Hello ' + state.toString());
     emit(CreateTaskComplete(taskDetails: state.taskDetails));
   }
 }
