@@ -1,10 +1,10 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
-import 'package:tick_tock/modules/tasks/ui/prompt_entry_screen.dart';
+import 'package:tick_tock/modules/home/ui/task_list_widget.dart';
 import 'package:tick_tock/shared/utils/constants.dart';
-import '../bloc/create_task_cubit.dart';
-import 'create_task_screen.dart';
+import '../../tasks/bloc/create_task_cubit.dart';
+import '../../tasks/ui/create_task_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,7 +15,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   void onTap() async {
-    context.push(const PromptEntryScreen());
+    context.push(BlocProvider(
+      create: (context) => CreateTaskCubit(),
+      child: const TaskEntrySheet(),
+    ));
   }
 
   @override
@@ -31,7 +34,6 @@ class _HomePageState extends State<HomePage> {
       resizeToAvoidBottomInset: false,
       backgroundColor: context.colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: context.colorScheme.surfaceContainer,
         title: Text(
           Constants.appName,
           style: context.textTheme.headlineSmall!
@@ -46,6 +48,7 @@ class _HomePageState extends State<HomePage> {
           AssetImage('assets/images/ic_gemini_icon.png'),
         ),
       ),
+      body: const TaskListWidget(),
     );
   }
 }

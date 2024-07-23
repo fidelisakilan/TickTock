@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
+import 'package:tick_tock/modules/home/bloc/task_history_cubit.dart';
 import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
 import 'package:tick_tock/modules/tasks/models/extensions.dart';
 import 'package:tick_tock/modules/tasks/ui/custom_repeat_screen.dart';
@@ -20,45 +21,59 @@ class _TaskEntrySheetState extends State<TaskEntrySheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.colorScheme.surface,
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const GapBox(gap: Gap.xxs),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: context.pop,
-                  child: Padding(
-                    padding: Dimens.horizontalPadding,
-                    child: Icon(
-                      Icons.close,
-                      color: context.colorScheme.inverseSurface,
+    return BlocListener<CreateTaskCubit, CreateTaskState>(
+      listener: (_, state) {
+        switch (state) {
+          case CreateTaskComplete():
+            context.read<TaskHistoryCubit>().fetchFromDb();
+            context.pop();
+            print('Hell0 1 ');
+          default:
+            break;
+        }
+      },
+      child: Scaffold(
+        backgroundColor: context.colorScheme.surface,
+        resizeToAvoidBottomInset: true,
+        body: SafeArea(
+          child: Column(
+            children: [
+              const GapBox(gap: Gap.xxs),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: context.pop,
+                    child: Padding(
+                      padding: Dimens.horizontalPadding,
+                      child: Icon(
+                        Icons.close,
+                        color: context.colorScheme.inverseSurface,
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: Dimens.horizontalPadding,
-                  child: BlocBuilder<CreateTaskCubit, TaskDetails>(
-                    builder: (context, state) {
-                      return FilledButton(
-                        onPressed: state.title != null ? _onSave : null,
-                        child: const Text('Save'),
-                      );
-                    },
+                  Padding(
+                    padding: Dimens.horizontalPadding,
+                    child: BlocBuilder<CreateTaskCubit, CreateTaskState>(
+                      builder: (context, state) {
+                        return FilledButton(
+                          onPressed: state.taskDetails.title.trim().isNotEmpty
+                              ? _onSave
+                              : null,
+                          child: const Text('Save'),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const _TaskTitleWidget(),
-            const Divider(),
-            const _ReminderWidget(),
-            const Divider(),
-            const Expanded(child: _TaskDescriptionWidget()),
-          ],
+                ],
+              ),
+              const _TaskTitleWidget(),
+              const Divider(),
+              const _ReminderWidget(),
+              const Divider(),
+              const Expanded(child: _TaskDescriptionWidget()),
+            ],
+          ),
         ),
       ),
     );
@@ -156,7 +171,8 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
   void _datePicker() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    final date = context.read<CreateTaskCubit>().state.startDate.date;
+    final date =
+        context.read<CreateTaskCubit>().state.taskDetails.startDate.date;
     final newDate = await showDialog(
       context: context,
       builder: (context) {
@@ -175,7 +191,8 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
   void _timePicker() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    final time = context.read<CreateTaskCubit>().state.startDate.time;
+    final time =
+        context.read<CreateTaskCubit>().state.taskDetails.startDate.time;
     final newTime = await showDialog(
       context: context,
       builder: (context) {
@@ -192,11 +209,12 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
   void _repeatMode() async {
     final state = context.read<CreateTaskCubit>().state;
 
-    String currentMode = state.repeatDetailsText ?? state.repeatFrequency.label;
+    String currentMode = state.taskDetails.repeatDetailsText ??
+        state.taskDetails.repeatFrequency.label;
 
     List<String> options = List.of([
       ...RepeatFrequency.values.map((e) => e.label),
-      if (currentMode != state.repeatFrequency.label) currentMode,
+      if (currentMode != state.taskDetails.repeatFrequency.label) currentMode,
     ]);
 
     final result = await showDialog(
@@ -218,7 +236,7 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
           child: const CustomRepeatScreen(),
         ));
         if (result is! bool && mounted) {
-          context.read<CreateTaskCubit>().updateDetails(state);
+          context.read<CreateTaskCubit>().updateDetails(state.taskDetails);
         }
       } else if (mounted && selectedFrequency != null) {
         context.read<CreateTaskCubit>().setRepeatMode(selectedFrequency);
@@ -231,14 +249,15 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CreateTaskCubit, TaskDetails>(
+    return BlocBuilder<CreateTaskCubit, CreateTaskState>(
       builder: (context, state) {
         return Padding(
           padding: Dimens.horizontalPadding,
           child: Column(
             children: [
               Visibility(
-                visible: state.repeatFrequency != RepeatFrequency.custom,
+                visible:
+                    state.taskDetails.repeatFrequency != RepeatFrequency.custom,
                 child: Row(
                   textBaseline: TextBaseline.alphabetic,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -259,7 +278,7 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
                             ),
                           ),
                           Switch(
-                            value: state.allDay,
+                            value: state.taskDetails.allDay,
                             onChanged: (value) {
                               context.read<CreateTaskCubit>().setAllDay(value);
                             },
@@ -285,18 +304,18 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
                         GestureDetector(
                           onTap: _datePicker,
                           child: Text(
-                            state.startDate.date.formattedText,
+                            state.taskDetails.startDate.date.formattedText,
                             style: context.textTheme.bodyLarge!.copyWith(
                               color: context.colorScheme.onSurface,
                             ),
                           ),
                         ),
                         Visibility(
-                          visible: !state.allDay,
+                          visible: !state.taskDetails.allDay,
                           child: GestureDetector(
                             onTap: _timePicker,
                             child: Text(
-                              state.startDate.time.format(context),
+                              state.taskDetails.startDate.time.format(context),
                               style: context.textTheme.bodyLarge!.copyWith(
                                 color: context.colorScheme.onSurface,
                               ),
@@ -320,7 +339,7 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
                     ),
                     const GapBox(gap: Gap.xxs),
                     Text(
-                      _tileName(state),
+                      _tileName(state.taskDetails),
                       style: context.textTheme.bodyLarge!.copyWith(
                         color: context.colorScheme.onSurface,
                       ),

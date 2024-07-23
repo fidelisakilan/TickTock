@@ -1,5 +1,4 @@
 import 'package:tick_tock/app/config.dart';
-import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
 
 class RepeatOptionsWidget extends StatelessWidget {
   final String currentMode;

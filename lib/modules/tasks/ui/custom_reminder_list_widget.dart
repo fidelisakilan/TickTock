@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
 import 'package:tick_tock/modules/tasks/models/extensions.dart';
-import 'package:wave_divider/wave_divider.dart';
+import 'package:tick_tock/shared/widgets/wavy_divider.dart';
 
 class CustomTimeListWidget extends StatefulWidget {
   const CustomTimeListWidget({super.key});
@@ -25,7 +25,7 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
         cubit.setStartTimeStamp(result);
       } else {
         final List<TimeStamp> newList =
-            List.from(cubit.state.reminders, growable: true);
+            List.from(cubit.state.taskDetails.reminders, growable: true);
         newList.remove(timeStamp);
         newList.add(result);
         cubit.setCustomTimeList(newList);
@@ -35,28 +35,25 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
 
   void _removeTime(TimeStamp timeStamp) {
     final List<TimeStamp> newList =
-        List.from(cubit.state.reminders, growable: true);
+        List.from(cubit.state.taskDetails.reminders, growable: true);
     newList.remove(timeStamp);
     cubit.setCustomTimeList(newList);
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CreateTaskCubit, TaskDetails>(
+    return BlocBuilder<CreateTaskCubit, CreateTaskState>(
       builder: (context, state) {
         return Stack(
           alignment: Alignment.bottomRight,
           children: [
             ListView.separated(
-              itemCount: state.reminders.length + 1,
+              itemCount: state.taskDetails.reminders.length + 1,
               separatorBuilder: (context, index) => Visibility(
                 visible: index != 0,
                 child: Container(
                   color: context.colorScheme.surfaceContainerLowest,
-                  child: WaveDivider(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    color: context.colorScheme.primary,
-                  ),
+                  child: const WavyDivider(),
                 ),
               ),
               itemBuilder: (context, index) {
@@ -78,10 +75,11 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
                       GestureDetector(
                         onTap: () {
                           _addTime(
-                              isStartTime: true, timeStamp: state.startDate);
+                              isStartTime: true,
+                              timeStamp: state.taskDetails.startDate);
                         },
                         child: ReminderCardWidget(
-                          item: state.startDate,
+                          item: state.taskDetails.startDate,
                           index: 0,
                           removeCallback: () {},
                         ),
@@ -101,7 +99,7 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
                     ],
                   );
                 }
-                final item = state.reminders[index - 1];
+                final item = state.taskDetails.reminders[index - 1];
                 return GestureDetector(
                   onTap: () => _addTime(timeStamp: item),
                   child: ReminderCardWidget(

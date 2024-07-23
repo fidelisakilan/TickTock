@@ -10,14 +10,15 @@ class DefaultPresetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CreateTaskCubit, TaskDetails>(
+    return BlocBuilder<CreateTaskCubit, CreateTaskState>(
       builder: (context, state) {
         return Column(
           children: [
             const RepeatEveryWidget(),
             const Divider(),
-            if (state.repeatFrequency == RepeatFrequency.weeks) ...[
-              WeekDaySelectionWidget(selectedDays: state.repeats.weekdays),
+            if (state.taskDetails.repeatFrequency == RepeatFrequency.weeks) ...[
+              WeekDaySelectionWidget(
+                  selectedDays: state.taskDetails.repeats.weekdays),
               const Divider(),
             ],
             const RepeatEndWidget(),
@@ -44,7 +45,7 @@ class _RepeatEndWidgetState extends State<RepeatEndWidget> {
   @override
   void initState() {
     super.initState();
-    endingDate = cubit.state.repeats.endDate ?? DateTime.now();
+    endingDate = cubit.state.taskDetails.repeats.endDate ?? DateTime.now();
   }
 
   void _datePicker(BuildContext context) async {
@@ -65,9 +66,9 @@ class _RepeatEndWidgetState extends State<RepeatEndWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CreateTaskCubit, TaskDetails>(
+    return BlocBuilder<CreateTaskCubit, CreateTaskState>(
       builder: (context, state) {
-        final hasEnding = state.repeats.endDate != null;
+        final hasEnding = state.taskDetails.repeats.endDate != null;
         return Padding(
           padding: Dimens.horizontalPadding,
           child: Column(
@@ -188,8 +189,8 @@ class _RepeatEveryWidgetState extends State<RepeatEveryWidget> {
   @override
   void initState() {
     super.initState();
-    textController.value =
-        TextEditingValue(text: cubit.state.repeats.interval.toString());
+    textController.value = TextEditingValue(
+        text: cubit.state.taskDetails.repeats.interval.toString());
   }
 
   final List<RepeatFrequency> options = [
@@ -226,7 +227,7 @@ class _RepeatEveryWidgetState extends State<RepeatEveryWidget> {
                     style: context.textTheme.labelLarge!
                         .copyWith(color: context.colorScheme.onSurface),
                     onChanged: (value) {
-                      if(value.trim().isNotEmpty){
+                      if (value.trim().isNotEmpty) {
                         cubit.setRepeatInterval(int.parse(value));
                       }
                     },

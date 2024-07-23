@@ -21,7 +21,7 @@ class _CustomRepeatScreenState extends State<CustomRepeatScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    switch (cubit.state.repeatFrequency) {
+    switch (cubit.state.taskDetails.repeatFrequency) {
       case RepeatFrequency.none:
         cubit.setRepeatMode(RepeatFrequency.days);
         break;

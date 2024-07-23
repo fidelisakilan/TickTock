@@ -53,6 +53,7 @@ dependencies:
   collection: ^1.18.0
   speech_to_text: ^6.6.2
   wave_divider: ^0.0.3
+  uuid: ^4.4.2
 
 dev_dependencies:
   flutter_test:
