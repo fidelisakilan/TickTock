@@ -18,6 +18,7 @@ sealed class TaskDetails with _$TaskDetails {
     @Default(false) bool allDay,
     @Default(RepeatDetails(interval: 1, weekdays: [])) RepeatDetails repeats,
     @Default([]) List<TimeStamp> reminders,
+    @Default([]) List<TimeStamp> completedDates,
   }) = _TaskDetails;
 
   const factory TaskDetails.done({
@@ -28,6 +29,7 @@ sealed class TaskDetails with _$TaskDetails {
     @Default(false) bool allDay,
     @Default(RepeatDetails(interval: 1, weekdays: [])) RepeatDetails repeats,
     @Default([]) List<TimeStamp> reminders,
+    @Default([]) List<TimeStamp> completedDates,
   }) = TaskDetailsDone;
 
   factory TaskDetails.fromJson(Map<String, dynamic> json) =>

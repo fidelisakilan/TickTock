@@ -29,17 +29,33 @@ class _TaskListWidgetState extends State<TaskListWidget> {
               itemBuilder: (context, index) {
                 final element = history[index];
                 return Container(
-                  padding: const EdgeInsets.all(15),
-                  margin: const EdgeInsets.all(10),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  margin: Dimens.horizontalPadding,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
-                    color: context.colorScheme.surfaceContainerHigh,
+                    color: context.colorScheme.surfaceContainer,
                   ),
-                  child: Text(element.title),
+                  child: Row(
+                    children: [
+                      Text(
+                        element.title,
+                        style: context.textTheme.titleLarge,
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.add),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.more_vert),
+                      ),
+                    ],
+                  ),
                 );
               },
-              separatorBuilder: (context, index) =>
-                  const WavyDivider(verticalPadding: 15),
+              separatorBuilder: (context, index) => const GapBox(gap: Gap.xs),
             ),
         };
       },
