@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'extensions.dart';
 import '../config.dart';
-import '../../modules/tasks/models/extensions.dart';
 
 part 'task_details_model.freezed.dart';
 
@@ -11,6 +11,7 @@ sealed class TaskDetails with _$TaskDetails {
   const TaskDetails._();
 
   const factory TaskDetails({
+    required String id,
     required String title,
     String? description,
     required TimeStamp startDate,
@@ -22,6 +23,7 @@ sealed class TaskDetails with _$TaskDetails {
   }) = _TaskDetails;
 
   const factory TaskDetails.done({
+    required String id,
     required String title,
     String? description,
     required TimeStamp startDate,

@@ -1,8 +1,9 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:tick_tock/app/config.dart';
+import 'package:tick_tock/modules/create_task/models/extensions.dart';
 import 'package:tick_tock/modules/home/repository/task_db_provider.dart';
+import 'package:uuid/uuid.dart';
 export '../../../app/models/task_details_model.dart';
 import '../../../app/models/task_details_model.dart';
 
@@ -13,16 +14,15 @@ part 'create_task_cubit.freezed.dart';
 class CreateTaskCubit extends Cubit<CreateTaskState> {
   CreateTaskCubit()
       : super(CreateTaskProgress(
-            taskDetails:
-                TaskDetails(startDate: startDate(), allDay: false, title: '')));
+          taskDetails: create(),
+        ));
 
-  static TimeStamp startDate() {
-    final date = DateTime.now().add(const Duration(hours: 1));
-    return TimeStamp(
-      date: DateTime(date.year, date.month, date.day),
-      time: TimeOfDay(hour: date.hour, minute: 0),
-    );
-  }
+  static TaskDetails create() => TaskDetails(
+        id: const Uuid().v1(),
+        startDate: Utils.startDate(),
+        allDay: false,
+        title: '',
+      );
 
   void setTitle(String? title) {
     emit(state.copyWith.taskDetails(title: title ?? ''));

@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
-import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
-import 'package:tick_tock/modules/tasks/bloc/speech_manager.dart';
-import 'package:tick_tock/modules/tasks/ui/create_task_screen.dart';
+import 'package:tick_tock/modules/create_task/bloc/create_task_cubit.dart';
+import 'package:tick_tock/modules/create_task/services/speech_manager.dart';
+import 'package:tick_tock/modules/create_task/ui/create_task_screen.dart';
 import 'package:tick_tock/shared/utils/app_toast.dart';
 
 enum TextInputType { text, voice }

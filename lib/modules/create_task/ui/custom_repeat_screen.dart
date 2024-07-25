@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
-import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
+import 'package:tick_tock/modules/create_task/bloc/create_task_cubit.dart';
 import 'custom_reminder_list_widget.dart';
 import 'default_preset_widget.dart';
 

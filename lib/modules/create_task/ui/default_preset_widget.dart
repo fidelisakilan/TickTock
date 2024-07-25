@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
-import 'package:tick_tock/modules/tasks/models/extensions.dart';
+import 'package:tick_tock/app/models/extensions.dart';
 
 import '../bloc/create_task_cubit.dart';
 

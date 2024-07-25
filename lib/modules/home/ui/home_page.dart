@@ -3,8 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/home/ui/task_list_widget.dart';
 import 'package:tick_tock/shared/utils/constants.dart';
-import '../../tasks/bloc/create_task_cubit.dart';
-import '../../tasks/ui/create_task_screen.dart';
+
+import '../../create_task/bloc/create_task_cubit.dart';
+import '../../create_task/ui/create_task_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

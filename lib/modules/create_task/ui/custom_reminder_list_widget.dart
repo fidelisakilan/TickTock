@@ -1,7 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
-import 'package:tick_tock/modules/tasks/bloc/create_task_cubit.dart';
-import 'package:tick_tock/modules/tasks/models/extensions.dart';
+import 'package:tick_tock/modules/create_task/models/extensions.dart';
+import '../bloc/create_task_cubit.dart';
+import '../../../app/models/extensions.dart';
 import 'package:tick_tock/shared/widgets/wavy_divider.dart';
 
 class CustomTimeListWidget extends StatefulWidget {
@@ -229,7 +230,7 @@ class _AddReminderWidgetState extends State<_AddReminderWidget> {
 
   @override
   void initState() {
-    timeStamp = widget.oldTimeStamp ?? CreateTaskCubit.startDate();
+    timeStamp = widget.oldTimeStamp ?? Utils.startDate();
     super.initState();
   }
 
