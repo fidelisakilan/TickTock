@@ -1,0 +1,21 @@
+{
+  "title": "Take medicine",
+  "description": "Take medicine every weekday until 5th aug",
+  "startDate": {
+    "date": "2024-07-06 00: 00: 00.000",
+    "time": "17:00"
+  },
+  "repeatFrequency": "weeks",
+  "allDay": false,
+  "repeats": {
+    "interval": 1,
+    "endDate": "2024-08-05 00: 00: 00.000",
+    "days": [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday"
+    ]
+  }
+}

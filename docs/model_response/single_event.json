@@ -1,0 +1,10 @@
+{
+  "title": "Take medicine",
+  "description": "Take it before meal",
+  "startDate": {
+    "date": "2024-07-06 00: 00: 00.000",
+    "time": "20:00"
+  },
+  "repeatFrequency": "none",
+  "allDay": false
+}

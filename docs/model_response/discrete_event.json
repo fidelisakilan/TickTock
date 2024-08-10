@@ -1,0 +1,32 @@
+{
+  "title": "Take medicine",
+  "description": "Take it five times",
+  "startDate": {
+    "date": "2024-07-06 00: 00: 00.000",
+    "time": "17:00"
+  },
+  "allDay": false,
+  "repeatFrequency": "custom",
+  "reminders": [
+    {
+      "date": "2024-07-06 00: 00: 00.000",
+      "time": "18:00"
+    },
+    {
+      "date": "2024-07-06 00: 00: 00.000",
+      "time": "19:00"
+    },
+    {
+      "date": "2024-07-06 00: 00: 00.000",
+      "time": "20:00"
+    },
+    {
+      "date": "2024-07-06 00: 00: 00.000",
+      "time": "21:00"
+    },
+    {
+      "date": "2024-07-06 00: 00: 00.000",
+      "time": "22:00"
+    }
+  ]
+}

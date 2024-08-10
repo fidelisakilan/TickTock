@@ -26,21 +26,34 @@ class _TaskListWidgetState extends State<TaskListWidget> {
           TasksLoading() => const LoadingWidget(),
           TasksLoaded(history: var history) => ListView.separated(
               itemCount: history.length,
+              padding: const EdgeInsets.only(bottom: 150),
               itemBuilder: (context, index) {
                 final element = history[index];
                 return Container(
                   padding:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   margin: Dimens.horizontalPadding,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(25),
                     color: context.colorScheme.surfaceContainer,
                   ),
                   child: Row(
                     children: [
-                      Text(
-                        element.title,
-                        style: context.textTheme.titleLarge,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Text(
+                              element.title,
+                              style: context.textTheme.titleLarge,
+                            ),
+                            Text(
+                              element.repeatDetailsText ??
+                                  element.startDate.text,
+                              style: context.textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
                       ),
                       const Spacer(),
                       IconButton(
@@ -55,7 +68,7 @@ class _TaskListWidgetState extends State<TaskListWidget> {
                   ),
                 );
               },
-              separatorBuilder: (context, index) => const GapBox(gap: Gap.xs),
+              separatorBuilder: (context, index) => const GapBox(gap: Gap.xxs),
             ),
         };
       },

@@ -1,9 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/create_task/models/extensions.dart';
 import 'package:tick_tock/modules/home/repository/task_db_provider.dart';
-import 'package:uuid/uuid.dart';
+import 'package:tick_tock/modules/task_manager/task_manager.dart';
 export '../../../app/models/task_details_model.dart';
 import '../../../app/models/task_details_model.dart';
 
@@ -18,7 +20,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
         ));
 
   static TaskDetails create() => TaskDetails(
-        id: const Uuid().v1(),
+        id: Random().nextInt(2^32),
         startDate: Utils.startDate(),
         allDay: false,
         title: '',
@@ -75,5 +77,6 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   void onSave() async {
     await TaskDbProvider().storeTaskData(state.taskDetails);
     emit(CreateTaskComplete(taskDetails: state.taskDetails));
+    TaskManager().scheduleNotification(state.taskDetails);
   }
 }

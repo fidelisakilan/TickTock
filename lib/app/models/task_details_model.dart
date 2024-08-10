@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:intl/intl.dart';
 import 'extensions.dart';
 import '../config.dart';
 
@@ -11,7 +12,7 @@ sealed class TaskDetails with _$TaskDetails {
   const TaskDetails._();
 
   const factory TaskDetails({
-    required String id,
+    required int id,
     required String title,
     String? description,
     required TimeStamp startDate,
@@ -23,7 +24,7 @@ sealed class TaskDetails with _$TaskDetails {
   }) = _TaskDetails;
 
   const factory TaskDetails.done({
-    required String id,
+    required int id,
     required String title,
     String? description,
     required TimeStamp startDate,
@@ -60,6 +61,7 @@ sealed class TaskDetails with _$TaskDetails {
 
 @freezed
 class RepeatDetails with _$RepeatDetails {
+  const RepeatDetails._();
 
   const factory RepeatDetails({
     required int interval,
@@ -73,14 +75,21 @@ class RepeatDetails with _$RepeatDetails {
 
 @freezed
 class TimeStamp with _$TimeStamp {
+  const TimeStamp._();
 
   const factory TimeStamp({
+    required String id,
     @DateTimeConverter() required DateTime date,
     @TimeOfDayConverter() required TimeOfDay time,
   }) = _TimeStamp;
 
   factory TimeStamp.fromJson(Map<String, dynamic> json) =>
       _$TimeStampFromJson(json);
+
+  DateTime get combined =>
+      DateTime(date.year, date.month, date.day, time.hour, time.minute);
+
+  String get text => DateFormat.yMMMd('en_US').add_jm().format(combined);
 }
 
 class DateTimeConverter

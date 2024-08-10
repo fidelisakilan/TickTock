@@ -1,4 +1,5 @@
 import 'package:tick_tock/app/config.dart';
+import 'package:uuid/uuid.dart';
 import '../bloc/create_task_cubit.dart';
 
 class Utils {
@@ -7,6 +8,7 @@ class Utils {
     return TimeStamp(
       date: DateTime(date.year, date.month, date.day),
       time: TimeOfDay(hour: date.hour, minute: 0),
+      id: const Uuid().v4(),
     );
   }
 }
