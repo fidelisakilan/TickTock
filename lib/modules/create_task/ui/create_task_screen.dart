@@ -87,6 +87,21 @@ class _TaskTitleWidget extends StatefulWidget {
 }
 
 class _TaskTitleWidgetState extends State<_TaskTitleWidget> {
+  final controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.value = TextEditingValue(
+        text: context.read<CreateTaskCubit>().state.taskDetails.title);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -96,6 +111,7 @@ class _TaskTitleWidgetState extends State<_TaskTitleWidget> {
           final trimmed = content.trim().isNotEmpty ? content.trim() : null;
           context.read<CreateTaskCubit>().setTitle(trimmed);
         },
+        controller: controller,
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: 'Add Title',
@@ -111,8 +127,31 @@ class _TaskTitleWidgetState extends State<_TaskTitleWidget> {
   }
 }
 
-class _TaskDescriptionWidget extends StatelessWidget {
+class _TaskDescriptionWidget extends StatefulWidget {
   const _TaskDescriptionWidget();
+
+  @override
+  State<_TaskDescriptionWidget> createState() => _TaskDescriptionWidgetState();
+}
+
+class _TaskDescriptionWidgetState extends State<_TaskDescriptionWidget> {
+  final TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final description =
+        context.read<CreateTaskCubit>().state.taskDetails.description;
+    if (description != null) {
+      controller.value = TextEditingValue(text: description);
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +171,7 @@ class _TaskDescriptionWidget extends StatelessWidget {
           const GapBox(gap: Gap.xxs),
           Expanded(
             child: TextField(
+              controller: controller,
               expands: true,
               minLines: null,
               maxLines: null,

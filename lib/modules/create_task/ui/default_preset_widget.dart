@@ -18,7 +18,7 @@ class DefaultPresetWidget extends StatelessWidget {
             const Divider(),
             if (state.taskDetails.repeatFrequency == RepeatFrequency.weeks) ...[
               WeekDaySelectionWidget(
-                  selectedDays: state.taskDetails.repeats.weekdays),
+                  selectedDays: state.taskDetails.repeats.days),
               const Divider(),
             ],
             const RepeatEndWidget(),
@@ -183,6 +183,7 @@ class RepeatEveryWidget extends StatefulWidget {
 class _RepeatEveryWidgetState extends State<RepeatEveryWidget> {
   final textController = TextEditingController();
   final optionController = TextEditingController();
+  late final initialFrequency = cubit.state.taskDetails.repeatFrequency;
 
   CreateTaskCubit get cubit => context.read<CreateTaskCubit>();
 
@@ -241,8 +242,13 @@ class _RepeatEveryWidgetState extends State<RepeatEveryWidget> {
               const GapBox(gap: Gap.xxs),
               IntrinsicWidth(
                 child: DropdownMenu<RepeatFrequency>(
-                  initialSelection: options.first,
+                  initialSelection: initialFrequency,
                   controller: optionController,
+                  onSelected: (value) {
+                    if (value != null) {
+                      cubit.setRepeatMode(value);
+                    }
+                  },
                   textStyle: context.textTheme.labelLarge!
                       .copyWith(color: context.colorScheme.onSurface),
                   expandedInsets: EdgeInsets.zero,

@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/create_task/bloc/create_task_cubit.dart';
+import 'package:tick_tock/modules/create_task/services/api_provider.dart';
 import 'package:tick_tock/modules/create_task/services/speech_manager.dart';
 import 'package:tick_tock/modules/create_task/ui/create_task_screen.dart';
 import 'package:tick_tock/shared/utils/app_toast.dart';
@@ -20,6 +21,7 @@ class _PromptEntryScreenState extends State<PromptEntryScreen> {
   final FocusNode focusNode = FocusNode();
   late TextInputType currentType;
   final speechManager = SpeechToTextManager();
+  bool loading = false;
 
   @override
   void initState() {
@@ -34,6 +36,7 @@ class _PromptEntryScreenState extends State<PromptEntryScreen> {
   }
 
   void startService(TextInputType type, {bool toggleKeyboard = true}) {
+    if (loading) return;
     currentType = type;
     if (mounted) setState(() {});
     switch (type) {
@@ -50,6 +53,7 @@ class _PromptEntryScreenState extends State<PromptEntryScreen> {
   }
 
   void startVoice() {
+    if (loading) return;
     if (speechManager.isRunning) {
       speechManager.stop();
       return;
@@ -65,11 +69,16 @@ class _PromptEntryScreenState extends State<PromptEntryScreen> {
     });
   }
 
-  void onTapManualEntry() {
-    context.pushReplacement(BlocProvider(
-      create: (context) => CreateTaskCubit(),
-      child: const TaskEntrySheet(),
-    ));
+  void onTapManualEntry() async {
+    setState(() => loading = true);
+    final result = await ApiProvider().fetchPromptData(controller.text);
+    setState(() => loading = false);
+    if (result != null && mounted) {
+      context.pushReplacement(BlocProvider(
+        create: (context) => CreateTaskCubit(result),
+        child: const TaskEntrySheet(),
+      ));
+    }
   }
 
   @override
@@ -97,7 +106,7 @@ class _PromptEntryScreenState extends State<PromptEntryScreen> {
                 children: [
                   LinearProgressIndicator(
                     backgroundColor: Colors.transparent,
-                    value: value ? null : 0,
+                    value: loading || value ? null : 0,
                   ),
                   Expanded(
                     child: Padding(

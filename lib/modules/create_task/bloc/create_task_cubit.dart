@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:tick_tock/app/config.dart';
@@ -14,13 +12,11 @@ part 'create_task_state.dart';
 part 'create_task_cubit.freezed.dart';
 
 class CreateTaskCubit extends Cubit<CreateTaskState> {
-  CreateTaskCubit()
-      : super(CreateTaskProgress(
-          taskDetails: create(),
-        ));
+  CreateTaskCubit(TaskDetails? taskDetails)
+      : super(CreateTaskProgress(taskDetails: taskDetails ?? create()));
 
   static TaskDetails create() => TaskDetails(
-        id: Random().nextInt(2^32),
+        id: Utils.randomInt,
         startDate: Utils.startDate(),
         allDay: false,
         title: '',
@@ -59,7 +55,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   }
 
   void setWeekDays(List<WeekDay> weekdays) {
-    emit(state.copyWith.taskDetails.repeats(weekdays: weekdays));
+    emit(state.copyWith.taskDetails.repeats(days: weekdays));
   }
 
   void updateDetails(TaskDetails details) {

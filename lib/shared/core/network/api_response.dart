@@ -4,8 +4,7 @@ class APIResponse<T> {
   late final int? statusCode;
 
   APIResponse.fromJson(dynamic jsonResponse, this.statusCode) {
-    message = jsonResponse['message'] ?? '';
-    data = jsonResponse['data'];
+    data = jsonResponse;
   }
 
   @override

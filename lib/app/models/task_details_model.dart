@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
+import 'package:tick_tock/modules/create_task/models/extensions.dart';
 import 'extensions.dart';
 import '../config.dart';
 
@@ -15,22 +16,22 @@ sealed class TaskDetails with _$TaskDetails {
     required int id,
     required String title,
     String? description,
-    required TimeStamp startDate,
+    @TimeStampConverter() required TimeStamp startDate,
     @Default(RepeatFrequency.none) RepeatFrequency repeatFrequency,
     @Default(false) bool allDay,
-    @Default(RepeatDetails(interval: 1, weekdays: [])) RepeatDetails repeats,
-    @Default([]) List<TimeStamp> reminders,
-    @Default([]) List<TimeStamp> completedDates,
+    @Default(RepeatDetails(interval: 1, days: [])) RepeatDetails repeats,
+    @TimeStampConverter() @Default([]) List<TimeStamp> reminders,
+    @TimeStampConverter() @Default([]) List<TimeStamp> completedDates,
   }) = _TaskDetails;
 
   const factory TaskDetails.done({
     required int id,
     required String title,
     String? description,
-    required TimeStamp startDate,
+    @TimeStampConverter() required TimeStamp startDate,
     @Default(RepeatFrequency.none) RepeatFrequency repeatFrequency,
     @Default(false) bool allDay,
-    @Default(RepeatDetails(interval: 1, weekdays: [])) RepeatDetails repeats,
+    @Default(RepeatDetails(interval: 1, days: [])) RepeatDetails repeats,
     @Default([]) List<TimeStamp> reminders,
     @Default([]) List<TimeStamp> completedDates,
   }) = TaskDetailsDone;
@@ -65,7 +66,7 @@ class RepeatDetails with _$RepeatDetails {
 
   const factory RepeatDetails({
     required int interval,
-    required List<WeekDay> weekdays,
+    @Default([]) List<WeekDay> days,
     @DateTimeConverter() DateTime? endDate,
   }) = _RepeatDetails;
 
@@ -78,7 +79,7 @@ class TimeStamp with _$TimeStamp {
   const TimeStamp._();
 
   const factory TimeStamp({
-    required String id,
+    required int id,
     @DateTimeConverter() required DateTime date,
     @TimeOfDayConverter() required TimeOfDay time,
   }) = _TimeStamp;
@@ -92,31 +93,55 @@ class TimeStamp with _$TimeStamp {
   String get text => DateFormat.yMMMd('en_US').add_jm().format(combined);
 }
 
-class DateTimeConverter
-    implements JsonConverter<DateTime, Map<String, dynamic>> {
+class DateTimeConverter implements JsonConverter<DateTime, String> {
   const DateTimeConverter();
 
   @override
-  DateTime fromJson(Map<String, dynamic> json) =>
-      DateTime.parse(json['content']);
+  DateTime fromJson(String content) => DateTime.parse(content);
 
   @override
-  Map<String, dynamic> toJson(DateTime object) =>
-      {'content': object.toString()};
+  String toJson(DateTime object) => object.toIso8601String();
 }
 
-class TimeOfDayConverter
-    implements JsonConverter<TimeOfDay, Map<String, dynamic>> {
+class TimeOfDayConverter implements JsonConverter<TimeOfDay, String> {
   const TimeOfDayConverter();
 
   @override
-  TimeOfDay fromJson(Map<String, dynamic> json) {
-    return TimeOfDay(hour: json['hour'], minute: json['minute']);
+  TimeOfDay fromJson(String time) {
+    return TimeOfDay(
+      hour: int.parse(time.split(':').first),
+      minute: int.parse(time.split(':').last),
+    );
   }
 
   @override
-  Map<String, dynamic> toJson(TimeOfDay object) =>
-      {'hour': object.hour, 'minute': object.minute};
+  String toJson(TimeOfDay object) => '${object.hour}:${object.minute}';
+}
+
+class TimeStampConverter
+    implements JsonConverter<TimeStamp, Map<String, dynamic>> {
+  const TimeStampConverter();
+
+  @override
+  TimeStamp fromJson(Map<String, dynamic> json) {
+    return TimeStamp(
+      id: json['id'] ?? Utils.randomInt,
+      date: DateTime.parse((json['date'] as String)),
+      time: TimeOfDay(
+        hour: int.parse(json['time'].split(':').first),
+        minute: int.parse(json['time'].split(':').last),
+      ),
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson(TimeStamp object) {
+    return {
+      'id': object.id,
+      'date': object.date.toIso8601String(),
+      'time': '${object.time.hour}:${object.time.minute}',
+    };
+  }
 }
 
 enum RepeatFrequency {

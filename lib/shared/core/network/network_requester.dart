@@ -24,7 +24,7 @@ class NetworkRequester {
   _prepareRequest() async {
     BaseOptions dioOptions = BaseOptions(
       connectTimeout: const Duration(milliseconds: 60000),
-      receiveTimeout:const Duration(milliseconds:  60000),
+      receiveTimeout: const Duration(milliseconds: 60000),
       sendTimeout: const Duration(milliseconds: 60000),
       baseUrl: baseUrl,
       responseType: ResponseType.json,
@@ -52,7 +52,6 @@ class NetworkRequester {
     _dioInitCompleter.complete();
   }
 
-
   _printLog(Object object) => log(object.toString());
 
   Future<dynamic> get({
@@ -73,27 +72,8 @@ class NetworkRequester {
     }
   }
 
-  Future<dynamic> rawGet({
-    required String path,
-    Map<String, dynamic>? query,
-    Options? options,
-  }) async {
-    await _dioInitCompleter.future;
-    try {
-      final response = await _dio.get(
-        path,
-        queryParameters: query,
-        options: options,
-      );
-      return response;
-    } on Exception catch (error) {
-      return ExceptionHandler.handleError(error);
-    }
-  }
-
   Future<dynamic> post({
     required String path,
-    Map<String, dynamic>? query,
     Map<String, dynamic>? data,
     Options? options,
   }) async {
@@ -101,7 +81,6 @@ class NetworkRequester {
     try {
       final response = await _dio.post(
         path,
-        queryParameters: query,
         data: data,
         options: options,
       );
@@ -110,5 +89,4 @@ class NetworkRequester {
       return ExceptionHandler.handleError(error);
     }
   }
-
 }
