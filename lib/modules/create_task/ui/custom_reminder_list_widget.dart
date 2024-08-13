@@ -112,14 +112,31 @@ class _CustomTimeListWidgetState extends State<CustomTimeListWidget> {
                 );
               },
             ),
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: FloatingActionButton(
-                  foregroundColor: context.colorScheme.onPrimaryContainer,
-                  backgroundColor: context.colorScheme.primaryContainer,
-                  onPressed: _addTime,
-                  child: const Icon(Icons.add_alarm),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: FloatingActionButton.extended(
+                    foregroundColor: context.colorScheme.onPrimaryContainer,
+                    backgroundColor: context.colorScheme.primaryContainer,
+                    onPressed: _addTime,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    label: Row(
+                      children: [
+                        const Icon(
+                          Icons.add_alarm,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Add Alarm',
+                          style: context.textTheme.labelMedium,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

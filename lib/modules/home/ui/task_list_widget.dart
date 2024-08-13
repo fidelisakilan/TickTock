@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/home/bloc/task_history_cubit.dart';
 import 'package:tick_tock/shared/widgets/loading_widget.dart';
-import 'package:tick_tock/shared/widgets/wavy_divider.dart';
 
 class TaskListWidget extends StatefulWidget {
   const TaskListWidget({super.key});
@@ -57,13 +56,21 @@ class _TaskListWidgetState extends State<TaskListWidget> {
                         ),
                       ),
                       const Spacer(),
-                      IconButton(
+                      ElevatedButton(
                         onPressed: () {},
-                        icon: const Icon(Icons.add),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.more_vert),
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(
+                              context.colorScheme.tertiaryContainer),
+                          foregroundColor: WidgetStateProperty.all(
+                              context.colorScheme.tertiary),
+                          shape:
+                              WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                        ),
+                        child: const Icon(Icons.add),
                       ),
                     ],
                   ),

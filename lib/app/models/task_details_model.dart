@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:tick_tock/modules/create_task/models/extensions.dart';
@@ -50,7 +51,28 @@ sealed class TaskDetails with _$TaskDetails {
     if (repeats.interval == 1 && repeats.endDate == null) {
       return repeatFrequency.label;
     } else {
-      String label =
+      String? label;
+      if (repeatFrequency == RepeatFrequency.weeks) {
+        const weekEnds = [WeekDay.saturday, WeekDay.sunday];
+        const weekDays = [
+          WeekDay.monday,
+          WeekDay.tuesday,
+          WeekDay.wednesday,
+          WeekDay.thursday,
+          WeekDay.friday
+        ];
+        final List<WeekDay> currentDays = List.from(repeats.days);
+        if (const ListEquality().equals(currentDays, weekDays)) {
+          label = 'Every ${repeats.interval} weekday${repeats.interval > 1 ? 's' : ''}';
+        } else if (const ListEquality().equals(currentDays, weekEnds)) {
+          label = 'Every ${repeats.interval} weekend${repeats.interval > 1 ? 's' : ''}';
+        } else if (currentDays.length > 1) {
+          label =
+              'Every ${repeats.interval} ${repeatFrequency.dropdownTitle}${repeats.interval > 1 ? 's' : ''} on ${currentDays.length} days';
+        }
+      }
+
+      label ??=
           'Every ${repeats.interval} ${repeatFrequency.dropdownTitle}${repeats.interval > 1 ? 's' : ''}';
       if (repeats.endDate != null) {
         label = '$label; Ends: ${repeats.endDate!.formattedText1}';
@@ -158,4 +180,16 @@ enum RepeatFrequency {
   const RepeatFrequency({required this.label, required this.dropdownTitle});
 }
 
-enum WeekDay { sunday, monday, tuesday, wednesday, thursday, friday, saturday }
+enum WeekDay {
+  monday(label: 'Monday'),
+  tuesday(label: 'Tuesday'),
+  wednesday(label: 'Wednesday'),
+  thursday(label: 'Thursday'),
+  friday(label: 'Friday'),
+  saturday(label: 'Saturday'),
+  sunday(label: 'Sunday');
+
+  final String label;
+
+  const WeekDay({required this.label});
+}

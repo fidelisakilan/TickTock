@@ -377,10 +377,12 @@ class _ReminderWidgetState extends State<_ReminderWidget> {
                       color: context.colorScheme.onSurface,
                     ),
                     const GapBox(gap: Gap.xxs),
-                    Text(
-                      _tileName(state.taskDetails),
-                      style: context.textTheme.bodyLarge!.copyWith(
-                        color: context.colorScheme.onSurface,
+                    Expanded(
+                      child: Text(
+                        _tileName(state.taskDetails),
+                        style: context.textTheme.bodyLarge!.copyWith(
+                          color: context.colorScheme.onSurface,
+                        ),
                       ),
                     ),
                   ],

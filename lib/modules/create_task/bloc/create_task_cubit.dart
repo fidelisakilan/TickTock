@@ -47,7 +47,12 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   }
 
   void setRepeatMode(RepeatFrequency frequency) {
-    emit(state.copyWith.taskDetails(repeatFrequency: frequency));
+    emit(state.copyWith.taskDetails(
+      repeatFrequency: frequency,
+      repeats: state.taskDetails.repeats.copyWith(days: [
+        WeekDay.values.elementAt(state.taskDetails.startDate.date.weekday)
+      ]),
+    ));
   }
 
   void setRepeatInterval(int value) {

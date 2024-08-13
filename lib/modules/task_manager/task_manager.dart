@@ -23,7 +23,9 @@ class TaskManager {
       } else if (model.repeatFrequency != RepeatFrequency.none) {
         if (model.repeats.endDate != null) {
           TimeStamp nextReminder = model.startDate;
-          while (nextReminder.date.isBefore(model.repeats.endDate!)) {}
+          // TODO: Implement this
+          // while (nextReminder.date.isBefore(model.repeats.endDate!)) {
+          // }
         } else {
           return _schedulePeriodically(model);
         }
