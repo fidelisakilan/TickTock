@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
-import 'package:tick_tock/modules/create_task/models/extensions.dart';
+import '../../modules/event_manager/models/extensions.dart';
 import 'extensions.dart';
 import '../config.dart';
 
@@ -63,9 +63,11 @@ sealed class TaskDetails with _$TaskDetails {
         ];
         final List<WeekDay> currentDays = List.from(repeats.days);
         if (const ListEquality().equals(currentDays, weekDays)) {
-          label = 'Every ${repeats.interval} weekday${repeats.interval > 1 ? 's' : ''}';
+          label =
+              'Every ${repeats.interval} weekday${repeats.interval > 1 ? 's' : ''}';
         } else if (const ListEquality().equals(currentDays, weekEnds)) {
-          label = 'Every ${repeats.interval} weekend${repeats.interval > 1 ? 's' : ''}';
+          label =
+              'Every ${repeats.interval} weekend${repeats.interval > 1 ? 's' : ''}';
         } else if (currentDays.length > 1) {
           label =
               'Every ${repeats.interval} ${repeatFrequency.dropdownTitle}${repeats.interval > 1 ? 's' : ''} on ${currentDays.length} days';

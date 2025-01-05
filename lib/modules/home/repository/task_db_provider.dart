@@ -1,7 +1,7 @@
-
 import 'package:sembast/sembast.dart';
-import 'package:tick_tock/modules/create_task/bloc/create_task_cubit.dart';
 import 'package:tick_tock/shared/core/database/database.dart';
+
+import '../../event_manager/bloc/create_task_cubit.dart';
 
 class TaskDbProvider {
   Future<Database> get _db => AppDatabase.instance.database;

@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:tick_tock/app/models/task_details_model.dart';
-import 'package:tick_tock/modules/create_task/models/extensions.dart';
-import 'package:tick_tock/shared/core/network/api_response.dart';
-import 'package:tick_tock/shared/core/network/network_requester.dart';
+import '../../../shared/core/network/api_response.dart';
+import '../../../shared/core/network/network_requester.dart';
+
+import '../models/extensions.dart';
 
 class ApiProvider {
   Future<TaskDetails?> fetchPromptData(String content) async {

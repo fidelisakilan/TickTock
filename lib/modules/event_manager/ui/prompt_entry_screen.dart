@@ -1,11 +1,12 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tick_tock/app/config.dart';
-import 'package:tick_tock/modules/create_task/bloc/create_task_cubit.dart';
-import 'package:tick_tock/modules/create_task/services/api_provider.dart';
-import 'package:tick_tock/modules/create_task/services/speech_manager.dart';
-import 'package:tick_tock/modules/create_task/ui/create_task_screen.dart';
-import 'package:tick_tock/shared/utils/app_toast.dart';
+import '../../../app/config.dart';
+import '../../../shared/utils/app_toast.dart';
+
+import '../bloc/create_task_cubit.dart';
+import '../services/api_provider.dart';
+import '../services/speech_manager.dart';
+import 'create_task_screen.dart';
 
 enum TextInputType { text, voice }
 
@@ -25,7 +26,7 @@ class _PromptEntryScreenState extends State<PromptEntryScreen> {
 
   @override
   void initState() {
-    startService(TextInputType.voice);
+    startService(TextInputType.text);
     super.initState();
   }
 

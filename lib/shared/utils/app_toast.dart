@@ -1,8 +1,6 @@
-import 'package:fluttertoast/fluttertoast.dart';
 
 class AppToast {
-  static void showToast(String message) => Fluttertoast.showToast(
-        msg: message,
-        gravity: ToastGravity.CENTER,
-      );
+  static void showToast(String message) {
+    print(message);
+ }
 }

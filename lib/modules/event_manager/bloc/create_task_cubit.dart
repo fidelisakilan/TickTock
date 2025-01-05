@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:tick_tock/app/config.dart';
-import 'package:tick_tock/modules/create_task/models/extensions.dart';
 import 'package:tick_tock/modules/home/repository/task_db_provider.dart';
-import 'package:tick_tock/modules/task_manager/task_manager.dart';
 export '../../../app/models/task_details_model.dart';
 import '../../../app/models/task_details_model.dart';
+import '../models/extensions.dart';
+import '../services/task_manager.dart';
 
 part 'create_task_state.dart';
 
