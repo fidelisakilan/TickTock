@@ -1,10 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
-import 'package:tick_tock/shared/utils/constants.dart';
-
-import '../../event_manager/bloc/create_task_cubit.dart';
-import '../../event_manager/ui/create_task_screen.dart';
+import 'package:tick_tock/modules/event_manager/event_manager.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,10 +11,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  void _onEventManager() async {
+  void _onEventManager() {
     context.push(BlocProvider(
-      create: (context) => CreateTaskCubit(null),
-      child: const TaskEntrySheet(),
+      create: (context) => ScheduleCubit(),
+      child: const SchedulePage(),
     ));
   }
 
@@ -43,17 +40,22 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: _onEventManager,
-            child: const Text("Event Manager"),
-          ),
-          ElevatedButton(
-            onPressed: _onDailyJournal,
-            child: const Text("Daily Journal"),
-          )
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ElevatedButton(
+              onPressed: _onEventManager,
+              child: const Text("Event Manager"),
+            ),
+            ElevatedButton(
+              onPressed: _onDailyJournal,
+              child: const Text("Daily Journal"),
+            )
+          ],
+        ),
       ),
     );
   }

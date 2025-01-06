@@ -1,8 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:dio/dio.dart';
-import 'package:tick_tock/shared/utils/app_toast.dart';
 
 class APIException implements Exception {
   final String? message;
@@ -56,14 +54,6 @@ class ExceptionHandler {
       return APIException(
           message: ErrorMessages.connectionTimeout, statusCode: 500);
     }
-  }
-}
-
-class HandleError {
-  HandleError._privateConstructor();
-
-  static handleError(APIException? error) {
-    AppToast.showToast(error?.message ?? ErrorMessages.networkGeneral);
   }
 }
 

@@ -1,8 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tick_tock/modules/home/bloc/task_history_cubit.dart';
-import 'package:tick_tock/modules/home/ui/home_page.dart';
+import 'package:tick_tock/modules/home/home.dart';
 import 'package:tick_tock/shared/core/theme/theme.dart';
-import 'package:tick_tock/shared/core/theme/util.dart';
 import 'config.dart';
 
 class App extends StatelessWidget {
@@ -13,9 +11,7 @@ class App extends StatelessWidget {
     TextTheme textTheme = createTextTheme(context, "Inter Tight", "Inter");
     MaterialTheme theme = MaterialTheme(textTheme: textTheme);
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => TaskHistoryCubit()),
-      ],
+      providers: const [],
       child: MaterialApp(
         themeMode: ThemeMode.system,
         darkTheme: theme.dark(),

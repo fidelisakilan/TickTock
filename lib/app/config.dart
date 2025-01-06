@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
 export 'package:flutter/material.dart';
 export 'package:flutter/foundation.dart';
-export 'package:tick_tock/shared/components/dimensions.dart';
+export 'package:tick_tock/shared/utils/constants.dart';
+export 'env.dart';
+export 'package:tick_tock/shared/widgets/widgets.dart';
+
+import 'package:flutter/material.dart';
 
 extension BuildContextExtension on BuildContext {
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
@@ -13,7 +16,9 @@ extension BuildContextExtension on BuildContext {
   Future push(Widget widget) {
     return Navigator.of(this).push(MaterialPageRoute(builder: (_) => widget));
   }
+
   Future pushReplacement(Widget widget) {
-    return Navigator.of(this).pushReplacement(MaterialPageRoute(builder: (_) => widget));
+    return Navigator.of(this)
+        .pushReplacement(MaterialPageRoute(builder: (_) => widget));
   }
 }
