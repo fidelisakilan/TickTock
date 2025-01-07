@@ -1,5 +1,4 @@
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/event_manager/event_manager.dart';
 
@@ -12,10 +11,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   void _onEventManager() {
-    context.push(BlocProvider(
-      create: (context) => ScheduleCubit(),
-      child: const SchedulePage(),
-    ));
+    context.push(const SchedulePage());
   }
 
   void _onDailyJournal() {}
