@@ -1,8 +1,25 @@
-import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tick_tock/modules/event_manager/service/schedule_event_service.dart';
+import '../repository/db_provider.dart';
+import '../models/models.dart';
 
-part 'schedule_state.dart';
+class ScheduleCubit extends Cubit<List<EventModel>> {
+  final dbProvider = DbProvider();
+  final scheduleServie = ScheduleEventService();
+  
 
-class ScheduleCubit extends Cubit<ScheduleState> {
-  ScheduleCubit() : super(ScheduleInitial());
+  ScheduleCubit() : super([]) {
+    _loadFromDb();
+  }
+
+  void _loadFromDb() async {
+    final eventList = await dbProvider.fetch();
+    emit(eventList);
+  }
+
+  void addEvent(EventModel event) async {
+    emit([...state, event]);
+    dbProvider.store(event);
+    scheduleServie.scheduleNotification(event);
+  }
 }

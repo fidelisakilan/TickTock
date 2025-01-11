@@ -12,6 +12,16 @@ extension BuildContextExtension on BuildContext {
 
   TextTheme get textTheme => Theme.of(this).textTheme;
 
+  double get screenWidth => MediaQuery.of(this).size.width;
+
+  double get screenHeight => MediaQuery.of(this).size.height;
+
+  MediaQueryData get mediaQuery => MediaQuery.of(this);
+
+  void showToast(String message) {
+    ScaffoldMessenger.of(this).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   void pop([dynamic result]) => Navigator.of(this).pop(result);
 
   Future push(Widget widget) {

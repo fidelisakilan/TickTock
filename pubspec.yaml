@@ -26,11 +26,16 @@ dependencies:
   speech_to_text: ^6.6.2
   wave_divider: ^0.0.3
   uuid: ^4.4.2
-  data_class: any
+  freezed_annotation: any
+  delightful_toast: ^1.1.0
+  fluttertoast: 8.2.10
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  freezed: any
+  build_runner: any
+  json_serializable: any
   flutter_lints: ^3.0.0
 
 flutter:
