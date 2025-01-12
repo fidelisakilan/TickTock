@@ -15,6 +15,7 @@ class App extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) => ScheduleCubit(),
+          lazy: false,
         )
       ],
       child: MaterialApp(

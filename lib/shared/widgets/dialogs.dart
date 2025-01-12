@@ -13,7 +13,11 @@ Future<dynamic> showCustomBottomSheet(context, Widget widget) =>
       builder: (context) => widget,
     );
 
-void showCustomToast(BuildContext context, String message) {
+void showCustomToast(
+  BuildContext context,
+  String message, {
+  Widget? actionButton,
+}) {
   DelightToastBar(
     position: DelightSnackbarPosition.top,
     builder: (context) => ToastCard(
@@ -21,12 +25,19 @@ void showCustomToast(BuildContext context, String message) {
         Icons.flutter_dash,
         size: 28,
       ),
-      title: Text(
-        message,
-        style: const TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 14,
-        ),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          if (actionButton != null) actionButton,
+        ],
       ),
       trailing: Padding(
         padding: const EdgeInsets.only(right: 10),
@@ -34,7 +45,7 @@ void showCustomToast(BuildContext context, String message) {
           onTap: () {
             DelightToastBar.removeAll();
           },
-          child: const Icon(Icons.close),
+          child: const Icon(Icons.clear_all_outlined),
         ),
       ),
     ),

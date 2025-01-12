@@ -12,7 +12,11 @@ class CreateEventWidget extends StatefulWidget {
 }
 
 class _CreateEventWidgetState extends State<CreateEventWidget> {
-  DateTime _currentDate = DateTime.now();
+  DateTime _currentDate = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
   TimeOfDay _currentTime = TimeOfDay.now();
   String? _title;
   String? _description;

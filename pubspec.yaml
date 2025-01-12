@@ -29,6 +29,7 @@ dependencies:
   freezed_annotation: any
   delightful_toast: ^1.1.0
   fluttertoast: 8.2.10
+  grouped_list: ^6.0.0
 
 dev_dependencies:
   flutter_test:

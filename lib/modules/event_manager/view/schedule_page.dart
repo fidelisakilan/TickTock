@@ -1,4 +1,5 @@
 import 'package:flutter/scheduler.dart';
+import 'package:grouped_list/grouped_list.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/event_manager/cubit/schedule_cubit.dart';
 import 'package:tick_tock/modules/event_manager/models/event_model.dart';
@@ -39,12 +40,32 @@ class _SchedulePageState extends State<SchedulePage> {
           Expanded(
             child: BlocBuilder<ScheduleCubit, List<EventModel>>(
               builder: (context, state) {
-                return ListView.builder(
-                  itemCount: state.length,
-                  itemBuilder: (context, index) {
-                    return EventTileWidget(
-                      event: state.elementAt(index),
+                return GroupedListView<EventModel, DateTime>(
+                  elements: state,
+                  groupBy: (element) => element.date,
+                  itemComparator: (item1, item2) {
+                    int comp = item1.time.compareTo(item2.time);
+                    if (comp != 0) {
+                      return comp;
+                    }
+                    comp = item1.title.compareTo(item2.title);
+                    if (comp != 0) {
+                      return comp;
+                    }
+                    return item1.nId.compareTo(item2.nId);
+                  },
+                  groupSeparatorBuilder: (DateTime groupByValue) {
+                    return Padding(
+                      padding: Dimens.horizontalPadding,
+                      child: Text(
+                        groupByValue.formattedText,
+                        style: context.textTheme.bodySmall!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
                     );
+                  },
+                  itemBuilder: (context, item) {
+                    return EventTileWidget(event: item);
                   },
                 );
               },
@@ -94,16 +115,68 @@ class _NotificationEnableWidgetState extends State<NotificationEnableWidget> {
 
 class EventTileWidget extends StatelessWidget {
   const EventTileWidget({super.key, required this.event});
+
   final EventModel event;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {},
-      title: Text(event.title, style: context.textTheme.titleSmall),
-      trailing: Text(
-          "${event.date.formattedText} ${event.time.format(context)}",
-          style: context.textTheme.bodySmall),
+    return ExpansionTile(
+      key: Key(event.nId.toString()),
+      shape: const Border(),
+      enableFeedback: true,
+      leading: Checkbox(
+        value: event.isCompleted,
+        onChanged: (value) =>
+            context.read<ScheduleCubit>().updateCompletion(event, value!),
+      ),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Text(
+              event.title,
+              style: context.textTheme.titleSmall,
+            ),
+          ),
+          Text(
+            event.time.format(context),
+            style: context.textTheme.bodySmall,
+          ),
+        ],
+      ),
+      backgroundColor: context.colorScheme.surfaceContainerHighest,
+      collapsedBackgroundColor: context.colorScheme.surface,
+      expansionAnimationStyle: AnimationStyle(
+        curve: Curves.easeIn,
+        reverseCurve: Curves.easeOut,
+      ),
+      children: [
+        Padding(
+          padding: Dimens.horizontalPadding,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () => context.read<ScheduleCubit>().removeEvent(event),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.delete,
+                    size: 20,
+                  ),
+                  const GapBox(gap: Gap.xxxs),
+                  Text(
+                    "Remove",
+                    style: context.textTheme.bodySmall!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

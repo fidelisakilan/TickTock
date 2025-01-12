@@ -10,7 +10,7 @@ class Dimens {
       EdgeInsets.symmetric(horizontal: 15, vertical: 15);
 }
 
-enum Gap { xxs, xs, s, m, l }
+enum Gap { xxxs, xxs, xs, s, m, l }
 
 class GapBox extends StatelessWidget {
   final Gap gap;
@@ -20,6 +20,11 @@ class GapBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (gap) {
+      case Gap.xxxs:
+        return const SizedBox(
+          height: 5,
+          width: 5,
+        );
       case Gap.xxs:
         return const SizedBox(
           height: 10,

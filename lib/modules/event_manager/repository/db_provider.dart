@@ -5,7 +5,7 @@ import '../models/models.dart';
 class DbProvider {
   Future<Database> get _db => AppDatabase.instance.database;
 
-  final _taskListStore = stringMapStoreFactory.store('task_list');
+  final _taskListStore = intMapStoreFactory.store('task_list');
 
   Future<List<EventModel>> fetch() async {
     final records = await _taskListStore.find(await _db);
@@ -17,6 +17,10 @@ class DbProvider {
   }
 
   Future<void> store(EventModel event) async {
-    await _taskListStore.add(await _db, event.toJson());
+    await _taskListStore.record(event.nId).put(await _db, event.toJson());
+  }
+
+  Future<void> remove(EventModel event) async {
+    await _taskListStore.record(event.nId).delete(await _db);
   }
 }

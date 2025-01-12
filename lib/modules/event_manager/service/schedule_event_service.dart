@@ -1,6 +1,7 @@
 import 'dart:developer';
-
+import 'package:collection/collection.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:tick_tock/modules/event_manager/repository/db_provider.dart';
 import 'package:tick_tock/shared/utils/utils.dart';
 import '../models/models.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -8,24 +9,34 @@ import 'package:timezone/timezone.dart' as tz;
 class ScheduleEventService {
   final plugin = FlutterLocalNotificationsPlugin();
 
-  void initialize() async {
+  void initialize(Function(int) updateAppList) async {
     plugin.initialize(
-      const InitializationSettings(),
+      const InitializationSettings(
+          android: AndroidInitializationSettings("ic_notification")),
       onDidReceiveBackgroundNotificationResponse: onNotificationTap,
-      onDidReceiveNotificationResponse: onNotificationTap,
+      onDidReceiveNotificationResponse: (response) {
+        if (response.actionId == "complete") {
+          updateAppList(response.id!);
+        }
+      },
     );
   }
 
-  void scheduleNotification(EventModel model) async {
-    try {
-      final dateTime = DateTime(
-        model.date.year,
-        model.date.month,
-        model.date.day,
-        model.time.hour,
-        model.time.minute,
-      );
+  void cancelNotification(EventModel model) {
+    plugin.cancel(model.nId);
+  }
 
+  void scheduleNotification(EventModel model) async {
+    cancelNotification(model);
+    try {
+      final dateTime = DateTime.now().add(const Duration(seconds: 5));
+      // final dateTime = DateTime(
+      //   model.date.year,
+      //   model.date.month,
+      //   model.date.day,
+      //   model.time.hour,
+      //   model.time.minute,
+      // );
       await plugin.zonedSchedule(
         model.nId,
         model.title,
@@ -62,7 +73,7 @@ class ScheduleEventService {
 
 enum TaskNotificationAction {
   complete('complete', 'Complete'),
-  snooze('snooze', 'Snooze');
+  snooze('dismiss', 'Dismiss');
 
   final String id;
   final String label;
@@ -71,9 +82,14 @@ enum TaskNotificationAction {
 }
 
 @pragma('vm:entry-point')
-void onNotificationTap(NotificationResponse notificationResponse) {
-  print("Notification TAPPED");
-  Utils.showToast(notificationResponse.toString());
-  print(
-      "notificationTapBackground ${notificationResponse.id} ${notificationResponse.actionId}");
+void onNotificationTap(NotificationResponse response) async {
+  Utils.showToast("${response.id}_${response.actionId}");
+  if (response.actionId == "complete") {
+    final eventList = await DbProvider().fetch();
+    final event =
+        eventList.firstWhereOrNull((element) => element.nId == response.id);
+    if (event != null) {
+      DbProvider().store(event.copyWith(isCompleted: true));
+    }
+  }
 }
