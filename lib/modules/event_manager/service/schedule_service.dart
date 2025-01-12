@@ -1,24 +1,21 @@
 import 'dart:developer';
+import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:tick_tock/modules/event_manager/repository/db_provider.dart';
-import 'package:tick_tock/shared/utils/utils.dart';
 import '../models/models.dart';
 import 'package:timezone/timezone.dart' as tz;
 
-class ScheduleEventService {
+import '../repository/db_provider.dart';
+
+class ScheduleService {
   final plugin = FlutterLocalNotificationsPlugin();
 
-  void initialize(Function(int) updateAppList) async {
+  void initialize() async {
     plugin.initialize(
       const InitializationSettings(
-          android: AndroidInitializationSettings("ic_notification")),
-      onDidReceiveBackgroundNotificationResponse: onNotificationTap,
-      onDidReceiveNotificationResponse: (response) {
-        if (response.actionId == "complete") {
-          updateAppList(response.id!);
-        }
-      },
+        android: AndroidInitializationSettings("@mipmap/ic_launcher"),
+      ),
+      onDidReceiveBackgroundNotificationResponse: _onCompleteAction,
     );
   }
 
@@ -56,14 +53,12 @@ class ScheduleEventService {
         android: AndroidNotificationDetails(
           'event_manager',
           'Events',
-          icon: 'ic_notification',
           importance: Importance.max,
           priority: Priority.high,
           actions: TaskNotificationAction.values.map((e) {
             return AndroidNotificationAction(
               e.id,
               e.label,
-              showsUserInterface: true,
             );
           }).toList(),
           enableVibration: true,
@@ -82,8 +77,7 @@ enum TaskNotificationAction {
 }
 
 @pragma('vm:entry-point')
-void onNotificationTap(NotificationResponse response) async {
-  Utils.showToast("${response.id}_${response.actionId}");
+void _onCompleteAction(NotificationResponse response) async {
   if (response.actionId == "complete") {
     final eventList = await DbProvider().fetch();
     final event =
@@ -91,5 +85,7 @@ void onNotificationTap(NotificationResponse response) async {
     if (event != null) {
       DbProvider().store(event.copyWith(isCompleted: true));
     }
+    IsolateNameServer.lookupPortByName('calendar_completion_bus')
+        ?.send(response.id!);
   }
 }
