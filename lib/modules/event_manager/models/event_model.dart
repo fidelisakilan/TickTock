@@ -1,21 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'event_model.g.dart';
+
 part 'event_model.freezed.dart';
 
 @Freezed()
 class EventModel with _$EventModel {
+  const EventModel._();
+
   const factory EventModel({
     required int nId,
     required DateTime date,
     @TimeOfDayConverter() required TimeOfDay time,
     required String title,
     String? description,
-    @Default(false) bool isCompleted,
+    @Default({}) Map<String, bool> completedDates,
+    DateTimeComponents? repeats,
   }) = _EventModel;
 
   factory EventModel.fromJson(Map<String, dynamic> json) =>
       _$EventModelFromJson(json);
+
+  bool isCompleted(DateTime current) {
+    return completedDates[current.toString()] ?? false;
+  }
 }
 
 class TimeOfDayConverter

@@ -2,9 +2,9 @@ import 'dart:developer';
 import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:tick_tock/modules/event_manager/models/extensions.dart';
 import '../models/models.dart';
 import 'package:timezone/timezone.dart' as tz;
-
 import '../repository/db_provider.dart';
 
 class ScheduleService {
@@ -26,14 +26,13 @@ class ScheduleService {
   void scheduleNotification(EventModel model) async {
     cancelNotification(model);
     try {
-      final dateTime = DateTime.now().add(const Duration(seconds: 5));
-      // final dateTime = DateTime(
-      //   model.date.year,
-      //   model.date.month,
-      //   model.date.day,
-      //   model.time.hour,
-      //   model.time.minute,
-      // );
+      final dateTime = DateTime(
+        model.date.year,
+        model.date.month,
+        model.date.day,
+        model.time.hour,
+        model.time.minute,
+      );
       await plugin.zonedSchedule(
         model.nId,
         model.title,
@@ -83,7 +82,10 @@ void _onCompleteAction(NotificationResponse response) async {
     final event =
         eventList.firstWhereOrNull((element) => element.nId == response.id);
     if (event != null) {
-      DbProvider().store(event.copyWith(isCompleted: true));
+      final newDates = Map<String, bool>.from(event.completedDates);
+      newDates[DateTime.now().clearedTime.toString()] = true;
+      final updatedEvent = event.copyWith(completedDates: newDates);
+      DbProvider().store(updatedEvent);
     }
     IsolateNameServer.lookupPortByName('calendar_completion_bus')
         ?.send(response.id!);

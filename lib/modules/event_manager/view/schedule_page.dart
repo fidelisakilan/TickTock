@@ -15,6 +15,8 @@ class SchedulePage extends StatefulWidget {
 }
 
 class _SchedulePageState extends State<SchedulePage> {
+  final DateTime _currentDate = DateTime.now().clearedTime;
+
   void _createEvent() async {
     final result =
         await showCustomBottomSheet(context, const CreateEventWidget());
@@ -65,7 +67,10 @@ class _SchedulePageState extends State<SchedulePage> {
                     );
                   },
                   itemBuilder: (context, item) {
-                    return EventTileWidget(event: item);
+                    return EventTileWidget(
+                      event: item,
+                      currentDate: _currentDate,
+                    );
                   },
                 );
               },
@@ -114,9 +119,14 @@ class _NotificationEnableWidgetState extends State<NotificationEnableWidget> {
 }
 
 class EventTileWidget extends StatelessWidget {
-  const EventTileWidget({super.key, required this.event});
+  const EventTileWidget({
+    super.key,
+    required this.event,
+    required this.currentDate,
+  });
 
   final EventModel event;
+  final DateTime currentDate;
 
   @override
   Widget build(BuildContext context) {
@@ -125,9 +135,14 @@ class EventTileWidget extends StatelessWidget {
       shape: const Border(),
       enableFeedback: true,
       leading: Checkbox(
-        value: event.isCompleted,
-        onChanged: (value) =>
-            context.read<ScheduleCubit>().updateCompletion(event, value!),
+        value: event.isCompleted(currentDate),
+        onChanged: (value) {
+          context.read<ScheduleCubit>().updateCompletion(
+                oldEvent: event,
+                isCompleted: value!,
+                date: currentDate,
+              );
+        },
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
