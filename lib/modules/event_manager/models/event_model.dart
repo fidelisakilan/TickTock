@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:intl/intl.dart';
 
 part 'event_model.g.dart';
 
@@ -17,7 +17,7 @@ class EventModel with _$EventModel {
     required String title,
     String? description,
     @Default({}) Map<String, bool> completedDates,
-    DateTimeComponents? repeats,
+    RepeatSchedule? repeats,
   }) = _EventModel;
 
   factory EventModel.fromJson(Map<String, dynamic> json) =>
@@ -44,4 +44,44 @@ class TimeOfDayConverter
   Map<String, dynamic> toJson(TimeOfDay object) {
     return {'hour': object.hour, 'minute': object.minute};
   }
+}
+
+extension RepeatScheduleExtension on RepeatSchedule {
+  String get label {
+    switch (this) {
+      case RepeatSchedule.none:
+        return "No Repeats";
+      case RepeatSchedule.time:
+        return 'Every Day';
+      case RepeatSchedule.dayOfWeekAndTime:
+        return 'Every Week';
+      case RepeatSchedule.dayOfMonthAndTime:
+        return "Every Month";
+      case RepeatSchedule.dateAndTime:
+        return "Every Year";
+    }
+  }
+
+  String scheduleName(DateTime current) {
+    switch (this) {
+      case RepeatSchedule.none:
+        return "Do not repeat";
+      case RepeatSchedule.time:
+        return "Every Day ${DateFormat.jm().format(current)}";
+      case RepeatSchedule.dayOfWeekAndTime:
+        return "Every Week ${DateFormat.jm().format(current)}";
+      case RepeatSchedule.dayOfMonthAndTime:
+        return "Every Month on day ${current.day}, at ${DateFormat.jm().format(current)} ";
+      case RepeatSchedule.dateAndTime:
+        return "Every year ${DateFormat('MMM dd').format(current)}, at ${DateFormat.jm().format(current)}";
+    }
+  }
+}
+
+enum RepeatSchedule {
+  none,
+  time,
+  dayOfWeekAndTime,
+  dayOfMonthAndTime,
+  dateAndTime,
 }

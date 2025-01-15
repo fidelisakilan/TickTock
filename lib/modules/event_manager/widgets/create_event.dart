@@ -1,8 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/event_manager/models/extensions.dart';
 import 'package:tick_tock/shared/utils/utils.dart';
 
 import '../models/models.dart';
+import 'widgets.dart';
 
 class CreateEventWidget extends StatefulWidget {
   const CreateEventWidget({super.key});
@@ -20,6 +22,7 @@ class _CreateEventWidgetState extends State<CreateEventWidget> {
   TimeOfDay _currentTime = TimeOfDay.now();
   String? _title;
   String? _description;
+  RepeatSchedule _repeatType = RepeatSchedule.none;
 
   void _datePicker() async {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -58,6 +61,22 @@ class _CreateEventWidgetState extends State<CreateEventWidget> {
     }
   }
 
+  void _repeatSchedule() async {
+    final result = await showDialog(
+      context: context,
+      builder: (_) => RepeatOptionsWidget(
+        options: RepeatSchedule.values,
+        date: _currentDate.copyWith(
+            hour: _currentTime.hour, minute: _currentTime.minute),
+        currentMode: _repeatType,
+      ),
+    );
+    setState(() {
+      _repeatType =
+          RepeatSchedule.values.firstWhere((element) => element == result);
+    });
+  }
+
   void _onCreate() {
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -68,6 +87,7 @@ class _CreateEventWidgetState extends State<CreateEventWidget> {
         description: _description,
         date: _currentDate,
         time: _currentTime,
+        repeats: _repeatType,
       ));
     } else {
       showCustomToast(context, "Give it a great title");
@@ -127,6 +147,7 @@ class _CreateEventWidgetState extends State<CreateEventWidget> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    const GapBox(gap: Gap.xxs),
                     OutlinedButton(
                       onPressed: _datePicker,
                       child: Text(_currentDate.formattedText),
@@ -137,6 +158,24 @@ class _CreateEventWidgetState extends State<CreateEventWidget> {
                       child: Text(_currentTime.format(context)),
                     ),
                   ],
+                ),
+                const GapBox(gap: Gap.xxs),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: OutlinedButton(
+                    onPressed: _repeatSchedule,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.repeat, size: 16),
+                        const GapBox(gap: Gap.xxxs),
+                        Text(
+                          _repeatType.label,
+                          style: context.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 const GapBox(gap: Gap.xxs),
                 Align(
