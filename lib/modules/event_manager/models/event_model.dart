@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 
@@ -16,16 +17,26 @@ class EventModel with _$EventModel {
     @TimeOfDayConverter() required TimeOfDay time,
     required String title,
     String? description,
-    @Default({}) Map<String, bool> completedDates,
-    RepeatSchedule? repeats,
+    @Default({}) Map<String, bool> completionList,
+    @Default(RepeatSchedule.none) RepeatSchedule repeats,
   }) = _EventModel;
 
   factory EventModel.fromJson(Map<String, dynamic> json) =>
       _$EventModelFromJson(json);
 
   bool isCompleted(DateTime current) {
-    return completedDates[current.toString()] ?? false;
+    return completionList[current.toString()] ?? false;
   }
+
+  int get completedCounts {
+    int count = 0;
+    completionList.forEach((key, value) {
+      if (value) count++;
+    });
+    return count;
+  }
+
+  bool get isRepeated => repeats != RepeatSchedule.none;
 }
 
 class TimeOfDayConverter
@@ -47,6 +58,21 @@ class TimeOfDayConverter
 }
 
 extension RepeatScheduleExtension on RepeatSchedule {
+  DateTimeComponents? get mapComponent {
+    switch (this) {
+      case RepeatSchedule.none:
+        return null;
+      case RepeatSchedule.time:
+        return DateTimeComponents.time;
+      case RepeatSchedule.dayOfWeekAndTime:
+        return DateTimeComponents.dayOfWeekAndTime;
+      case RepeatSchedule.dayOfMonthAndTime:
+        return DateTimeComponents.dayOfMonthAndTime;
+      case RepeatSchedule.dateAndTime:
+        return DateTimeComponents.dateAndTime;
+    }
+  }
+
   String get label {
     switch (this) {
       case RepeatSchedule.none:

@@ -130,68 +130,72 @@ class EventTileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTile(
-      key: Key(event.nId.toString()),
-      shape: const Border(),
-      enableFeedback: true,
-      leading: Checkbox(
-        value: event.isCompleted(currentDate),
-        onChanged: (value) {
-          context.read<ScheduleCubit>().updateCompletion(
-                oldEvent: event,
-                isCompleted: value!,
-                date: currentDate,
-              );
-        },
-      ),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Flexible(
-            child: Text(
-              event.title,
-              style: context.textTheme.titleSmall,
-            ),
-          ),
-          Text(
-            event.time.format(context),
-            style: context.textTheme.bodySmall,
-          ),
-        ],
-      ),
-      backgroundColor: context.colorScheme.surfaceContainerHighest,
-      collapsedBackgroundColor: context.colorScheme.surface,
-      expansionAnimationStyle: AnimationStyle(
-        curve: Curves.easeIn,
-        reverseCurve: Curves.easeOut,
-      ),
-      children: [
-        Padding(
-          padding: Dimens.horizontalPadding,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton(
-              onPressed: () => context.read<ScheduleCubit>().removeEvent(event),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.delete,
-                    size: 20,
-                  ),
-                  const GapBox(gap: Gap.xxxs),
-                  Text(
-                    "Remove",
-                    style: context.textTheme.bodySmall!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    return Dismissible(
+      onDismissed: (direction) {
+        context.read<ScheduleCubit>().removeEvent(event);
+      },
+      direction: DismissDirection.endToStart,
+      background: Container(
+        color: context.colorScheme.error,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        child: Text(
+          "Delete",
+          style: context.textTheme.titleLarge!.copyWith(
+            color: context.colorScheme.onError,
           ),
         ),
-      ],
+      ),
+      key: Key(event.nId.toString()),
+      child: ListTile(
+        shape: const Border(),
+        enableFeedback: true,
+        leading: Checkbox(
+          value: event.isCompleted(currentDate),
+          onChanged: (value) {
+            context.read<ScheduleCubit>().updateCompletion(
+                  oldEvent: event,
+                  isCompleted: value!,
+                  date: currentDate,
+                );
+          },
+        ),
+        onTap: () {},
+        subtitle: event.isRepeated
+            ? Row(
+                children: [
+                  Text(
+                    event.repeats.label,
+                    style: context.textTheme.labelSmall,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              )
+            : null,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (event.isRepeated && event.completedCounts > 0) ...[
+              Text(
+                "🔥${event.completedCounts}",
+                style: context.textTheme.bodySmall,
+              ),
+            ],
+            const GapBox(gap: Gap.xs),
+            Text(
+              event.time.format(context),
+              style: context.textTheme.bodySmall,
+            ),
+          ],
+        ),
+        title: Text(
+          event.title,
+          style: context.textTheme.titleSmall,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
     );
   }
 }

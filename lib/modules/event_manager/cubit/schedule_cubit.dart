@@ -40,24 +40,31 @@ class ScheduleCubit extends Cubit<List<EventModel>> {
     required DateTime date,
     required bool isCompleted,
   }) async {
-    final newDates = Map<String, bool>.from(oldEvent.completedDates);
+    final newDates = Map<String, bool>.from(oldEvent.completionList);
     newDates[date.toString()] = isCompleted;
-    final updatedEvent = oldEvent.copyWith(completedDates: newDates);
+    final updatedEvent = oldEvent.copyWith(completionList: newDates);
     state.remove(oldEvent);
     emit([...state, updatedEvent]);
     dbProvider.store(updatedEvent);
-    //TODO:
-    // if (!updatedEvent.isCompleted) {
-    //   scheduleService.scheduleNotification(updatedEvent);
-    // } else {
-    //   scheduleService.cancelNotification(updatedEvent);
-    // }
+
+    if (updatedEvent.isRepeated) {
+      if (isCompleted) {
+        scheduleService.cancelNotification(updatedEvent);
+      } else {
+        scheduleService.scheduleNotification(
+            updatedEvent, date, updatedEvent.time);
+      }
+    } else {
+      if (isCompleted) {
+        scheduleService.cancelNotification(updatedEvent);
+      }
+    }
   }
 
   void addEvent(EventModel event) async {
     emit([...state, event]);
     dbProvider.store(event);
-    scheduleService.scheduleNotification(event);
+    scheduleService.scheduleNotification(event, event.date, event.time);
   }
 
   void removeEvent(EventModel event) async {

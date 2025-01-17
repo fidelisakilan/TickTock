@@ -23,15 +23,15 @@ class ScheduleService {
     plugin.cancel(model.nId);
   }
 
-  void scheduleNotification(EventModel model) async {
+  void scheduleNotification(EventModel model, date, time) async {
     cancelNotification(model);
     try {
       final dateTime = DateTime(
-        model.date.year,
-        model.date.month,
-        model.date.day,
-        model.time.hour,
-        model.time.minute,
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
       );
       await plugin.zonedSchedule(
         model.nId,
@@ -42,6 +42,7 @@ class ScheduleService {
         androidScheduleMode: AndroidScheduleMode.alarmClock,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.wallClockTime,
+        matchDateTimeComponents: model.repeats.mapComponent,
       );
     } catch (e, stack) {
       log('error', error: e, stackTrace: stack);
@@ -82,9 +83,9 @@ void _onCompleteAction(NotificationResponse response) async {
     final event =
         eventList.firstWhereOrNull((element) => element.nId == response.id);
     if (event != null) {
-      final newDates = Map<String, bool>.from(event.completedDates);
+      final newDates = Map<String, bool>.from(event.completionList);
       newDates[DateTime.now().clearedTime.toString()] = true;
-      final updatedEvent = event.copyWith(completedDates: newDates);
+      final updatedEvent = event.copyWith(completionList: newDates);
       DbProvider().store(updatedEvent);
     }
     IsolateNameServer.lookupPortByName('calendar_completion_bus')
