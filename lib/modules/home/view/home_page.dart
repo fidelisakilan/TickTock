@@ -1,13 +1,6 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/event_manager/event_manager.dart';
-import 'package:path/path.dart' as path;
-import 'package:tick_tock/modules/event_manager/models/models.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -62,12 +55,14 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           FloatingActionButton.small(
+            heroTag: 'export_data',
             onPressed: _exportData,
             child: const Icon(Icons.upload),
           ),
           const GapBox(gap: Gap.s),
           FloatingActionButton.small(
             onPressed: _importData,
+            heroTag: 'import_data',
             child: const Icon(Icons.download),
           ),
         ],

@@ -33,6 +33,7 @@ class _SchedulePageState extends State<SchedulePage> {
         title: const Text("Schedule List"),
       ),
       floatingActionButton: FloatingActionButton.small(
+        heroTag: 'create_event',
         onPressed: _createEvent,
         child: const Icon(Icons.add),
       ),

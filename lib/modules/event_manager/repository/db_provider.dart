@@ -26,15 +26,16 @@ class DbProvider {
 
   Future<List<Map>> createBackup() async {
     final records = await _taskListStore.find(await _db);
-    return records.map((e) => {e.key: e.value}).toList();
+    return records.map((e) => e.value).toList();
   }
 
-  void restoreBackup(List<dynamic> records) async {
+  Future<List<EventModel>> restoreBackup(List<dynamic> records) async {
     await _taskListStore.delete(await _db);
-    for (Map<int, Map<String, dynamic>> e in records) {
-      _taskListStore
-          .record(e.entries.first.key)
-          .put(await _db, e.entries.first.value);
+    final List<EventModel> taskList = [];
+    for (var e in records) {
+      taskList.add(EventModel.fromJson(e));
+      _taskListStore.record(e["nId"]).put(await _db, e);
     }
+    return taskList;
   }
 }
