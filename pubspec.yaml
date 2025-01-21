@@ -24,9 +24,14 @@ dependencies:
   path: ^1.9.0
   google_fonts: ^6.2.1
   speech_to_text: ^6.6.2
-  wave_divider: ^0.0.3
   uuid: ^4.4.2
   freezed_annotation: any
+  share_plus: ^10.1.4
+  file_picker: ^8.1.7
+
+  
+  ## UI
+  wave_divider: ^0.0.3
   delightful_toast: ^1.1.0
   fluttertoast: 8.2.10
   grouped_list: ^6.0.0

@@ -1,8 +1,14 @@
+import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:file_picker/file_picker.dart';
+import 'package:path/path.dart' as path;
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/event_manager/models/extensions.dart';
 import '../service/schedule_service.dart';
 import '../repository/db_provider.dart';
@@ -15,7 +21,9 @@ class ScheduleCubit extends Cubit<List<EventModel>> {
 
   ScheduleCubit() : super([]) {
     scheduleService.initialize();
-    _loadFromDb();
+    dbProvider.fetch().then((value) {
+      emit(value);
+    });
     IsolateNameServer.registerPortWithName(
         receivePort.sendPort, 'calendar_completion_bus');
     receivePort.listen((message) {
@@ -30,9 +38,34 @@ class ScheduleCubit extends Cubit<List<EventModel>> {
     });
   }
 
-  void _loadFromDb() async {
-    final eventList = await dbProvider.fetch();
-    emit(eventList);
+  Future<bool> exportData() async {
+    final eventList = await dbProvider.createBackup();
+    if (eventList.isNotEmpty) {
+      Directory appDir = await getTemporaryDirectory();
+      String filePath = path.joinAll([appDir.path, "ticktock-bak.txt"]);
+      File tempFile = File(filePath);
+      tempFile.writeAsStringSync(eventList.toString());
+      Share.shareXFiles([XFile(tempFile.path)]);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> importData() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      try {
+        final backupFile = File(result.files.single.path!);
+        final backupStr = backupFile.readAsStringSync();
+        final g = backupStr.split(",");
+        print(g);
+        return true;
+      } catch (e, stack) {
+        logger(error: e, stack: stack);
+      }
+    }
+    throw UserCancelledException();
   }
 
   void updateCompletion({

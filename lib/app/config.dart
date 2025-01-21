@@ -4,6 +4,8 @@ export 'package:tick_tock/shared/utils/constants.dart';
 export 'env.dart';
 export 'package:tick_tock/shared/widgets/widgets.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';
+export 'package:tick_tock/shared/core/exceptions.dart';
+export 'package:tick_tock/shared/utils/logger.dart';
 
 import 'package:flutter/material.dart';
 

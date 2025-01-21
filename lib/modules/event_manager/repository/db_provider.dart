@@ -23,4 +23,18 @@ class DbProvider {
   Future<void> remove(EventModel event) async {
     await _taskListStore.record(event.nId).delete(await _db);
   }
+
+  Future<List<Map>> createBackup() async {
+    final records = await _taskListStore.find(await _db);
+    return records.map((e) => {e.key: e.value}).toList();
+  }
+
+  void restoreBackup(List<dynamic> records) async {
+    await _taskListStore.delete(await _db);
+    for (Map<int, Map<String, dynamic>> e in records) {
+      _taskListStore
+          .record(e.entries.first.key)
+          .put(await _db, e.entries.first.value);
+    }
+  }
 }

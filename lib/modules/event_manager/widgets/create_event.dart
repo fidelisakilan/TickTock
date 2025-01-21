@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:tick_tock/app/config.dart';
 import 'package:tick_tock/modules/event_manager/models/extensions.dart';
 import 'package:tick_tock/shared/utils/utils.dart';
@@ -14,15 +13,20 @@ class CreateEventWidget extends StatefulWidget {
 }
 
 class _CreateEventWidgetState extends State<CreateEventWidget> {
-  DateTime _currentDate = DateTime(
-    DateTime.now().year,
-    DateTime.now().month,
-    DateTime.now().day,
-  );
-  TimeOfDay _currentTime = TimeOfDay.now();
+  late DateTime _currentDate;
+  late TimeOfDay _currentTime;
   String? _title;
   String? _description;
   RepeatSchedule _repeatType = RepeatSchedule.none;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now().add(const Duration(hours: 1));
+
+    _currentDate = DateTime(now.year, now.month, now.day);
+    _currentTime = TimeOfDay(hour: now.hour, minute: 0);
+  }
 
   void _datePicker() async {
     FocusManager.instance.primaryFocus?.unfocus();
