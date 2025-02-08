@@ -59,6 +59,16 @@ class ScheduleCubit extends Cubit<List<EventModel>> {
         final backupFile = File(result.files.single.path!);
         final output = backupFile.readAsStringSync();
         final records = await dbProvider.restoreBackup(json.decode(output));
+        //TODO: Add implementation to schedule events when backup is restored
+
+        // for (EventModel rec in records) {
+        //   if (rec.isCompleted(current)) {
+        //     scheduleService.cancelNotification(updatedEvent);
+        //   } else {
+        //     scheduleService.scheduleNotification(
+        //         updatedEvent, date, updatedEvent.time);
+        //   }
+        // }
         emit(records);
         return true;
       } catch (e, stack) {

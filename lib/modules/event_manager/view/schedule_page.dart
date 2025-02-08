@@ -142,7 +142,7 @@ class EventTileWidget extends StatelessWidget {
         padding: const EdgeInsets.only(right: 20),
         child: Text(
           "Delete",
-          style: context.textTheme.titleLarge!.copyWith(
+          style: context.textTheme.titleMedium!.copyWith(
             color: context.colorScheme.onError,
           ),
         ),
